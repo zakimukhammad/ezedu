@@ -1,0 +1,508 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+
+<BaseLayout title="Beranda" description="EzEdu — Platform belajar interaktif untuk anak. Matematika, Sains, Koding, dan lainnya.">
+  <!-- Navbar -->
+  <nav class="navbar">
+    <div class="container navbar-inner">
+      <a href="/" class="logo" id="nav-logo">
+        <span class="logo-icon">🎓</span>
+        <span class="logo-text">Ez<span class="text-gradient">Edu</span></span>
+      </a>
+      <div class="nav-actions">
+        <a href="/masuk" class="btn btn-secondary" id="nav-login">Masuk</a>
+        <a href="/daftar" class="btn btn-primary" id="nav-signup">Daftar Gratis</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="container hero-inner">
+      <div class="hero-content animate-slide-up">
+        <span class="badge badge-primary">✨ Belajar Jadi Seru!</span>
+        <h1 class="hero-title">
+          Belajar Sambil <span class="text-gradient">Bermain</span>
+          <br />untuk Anak Usia 4–12 Tahun
+        </h1>
+        <p class="hero-subtitle">
+          Platform belajar interaktif dengan kuis, mini-game, animasi, dan hadiah yang bikin anak semangat belajar setiap hari.
+        </p>
+        <div class="hero-actions">
+          <a href="/daftar" class="btn btn-primary btn-lg" id="hero-signup">
+            Mulai Belajar Sekarang 🚀
+          </a>
+          <a href="#kategori" class="btn btn-secondary btn-lg" id="hero-explore">
+            Jelajahi Kategori
+          </a>
+        </div>
+        <div class="hero-stats">
+          <div class="stat">
+            <span class="stat-number">6</span>
+            <span class="stat-label">Kategori</span>
+          </div>
+          <div class="stat-divider"></div>
+          <div class="stat">
+            <span class="stat-number">3</span>
+            <span class="stat-label">Grup Usia</span>
+          </div>
+          <div class="stat-divider"></div>
+          <div class="stat">
+            <span class="stat-number">100+</span>
+            <span class="stat-label">Pelajaran</span>
+          </div>
+        </div>
+      </div>
+      <div class="hero-visual animate-fade-in">
+        <div class="hero-card-stack">
+          <div class="floating-card fc-1 animate-float">🧮 Matematika</div>
+          <div class="floating-card fc-2 animate-float" style="animation-delay: 0.5s">🔬 Sains</div>
+          <div class="floating-card fc-3 animate-float" style="animation-delay: 1s">💻 Koding</div>
+          <div class="floating-card fc-4 animate-float" style="animation-delay: 1.5s">📚 Bahasa</div>
+          <div class="floating-card fc-5 animate-float" style="animation-delay: 0.75s">🧩 Logika</div>
+          <div class="floating-card fc-6 animate-float" style="animation-delay: 1.25s">🎨 Seni</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Categories Section -->
+  <section class="categories-section" id="kategori">
+    <div class="container">
+      <h2 class="section-title text-center animate-fade-in">
+        Kategori <span class="text-gradient">Pembelajaran</span>
+      </h2>
+      <p class="section-subtitle text-center text-muted">
+        Kurikulum lengkap yang disesuaikan dengan usia dan kemampuan anak
+      </p>
+      <div class="grid-auto mt-xl stagger-children">
+        <div class="category-card" style="--card-color: #f59e0b">
+          <div class="category-icon">🧮</div>
+          <h3>Matematika</h3>
+          <p>Belajar angka, hitung, dan geometri dengan cara yang menyenangkan</p>
+          <span class="badge badge-warning">5 Level</span>
+        </div>
+        <div class="category-card" style="--card-color: #10b981">
+          <div class="category-icon">🔬</div>
+          <h3>Sains & Alam</h3>
+          <p>Jelajahi dunia sains dan alam sekitar lewat eksperimen virtual</p>
+          <span class="badge badge-success">5 Level</span>
+        </div>
+        <div class="category-card" style="--card-color: #6366f1">
+          <div class="category-icon">💻</div>
+          <h3>Koding & Logika</h3>
+          <p>Belajar dasar pemrograman dan berpikir logis sejak dini</p>
+          <span class="badge badge-primary">5 Level</span>
+        </div>
+        <div class="category-card" style="--card-color: #ec4899">
+          <div class="category-icon">📚</div>
+          <h3>Bahasa & Literasi</h3>
+          <p>Membaca, menulis, dan memperkaya kosakata dengan latihan interaktif</p>
+          <span class="badge" style="background: rgba(236, 72, 153, 0.15); color: #f472b6;">5 Level</span>
+        </div>
+        <div class="category-card" style="--card-color: #8b5cf6">
+          <div class="category-icon">🧩</div>
+          <h3>Logika & Teka-teki</h3>
+          <p>Asah otak dengan puzzle dan teka-teki seru yang menantang</p>
+          <span class="badge" style="background: rgba(139, 92, 246, 0.15); color: #a78bfa;">4 Level</span>
+        </div>
+        <div class="category-card" style="--card-color: #f97316">
+          <div class="category-icon">🎨</div>
+          <h3>Seni & Kreativitas</h3>
+          <p>Gambar, warna, musik, dan kreasi digital untuk ekspresi bebas</p>
+          <span class="badge" style="background: rgba(249, 115, 22, 0.15); color: #fb923c;">3 Level</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Age Groups Section -->
+  <section class="age-section">
+    <div class="container">
+      <h2 class="section-title text-center">
+        Disesuaikan <span class="text-gradient">Usia Anak</span>
+      </h2>
+      <p class="section-subtitle text-center text-muted">
+        Setiap kelompok usia mendapat tampilan, tingkat kesulitan, dan gaya interaksi yang berbeda
+      </p>
+      <div class="age-groups mt-xl stagger-children">
+        <div class="age-card age-explorers">
+          <div class="age-emoji">🌟</div>
+          <h3>Penjelajah</h3>
+          <span class="age-range">4–6 Tahun</span>
+          <ul class="age-features">
+            <li>🎨 Warna cerah & karakter lucu</li>
+            <li>🔊 Narasi suara</li>
+            <li>⏱️ Sesi 5–10 menit</li>
+            <li>🏆 Stiker & animasi</li>
+          </ul>
+        </div>
+        <div class="age-card age-builders">
+          <div class="age-emoji">🚀</div>
+          <h3>Pembangun</h3>
+          <span class="age-range">7–9 Tahun</span>
+          <ul class="age-features">
+            <li>📝 Kuis & drag-and-drop</li>
+            <li>🎮 Mini-game interaktif</li>
+            <li>⏱️ Sesi 10–15 menit</li>
+            <li>🏅 Lencana & streak</li>
+          </ul>
+        </div>
+        <div class="age-card age-challengers">
+          <div class="age-emoji">⚡</div>
+          <h3>Penantang</h3>
+          <span class="age-range">10–12 Tahun</span>
+          <ul class="age-features">
+            <li>💻 Tantangan koding</li>
+            <li>📊 Papan peringkat</li>
+            <li>⏱️ Sesi 15–25 menit</li>
+            <li>🏆 XP & level-up</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA Section -->
+  <section class="cta-section">
+    <div class="container text-center">
+      <div class="cta-card card-glass">
+        <h2>Siap Mulai Belajar?</h2>
+        <p class="text-muted mt-sm">Daftar gratis dan mulai petualangan belajar anak Anda sekarang</p>
+        <a href="/daftar" class="btn btn-primary btn-lg mt-lg" id="cta-signup">
+          Buat Akun Gratis 🎉
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container text-center">
+      <p class="text-muted">© 2026 EzEdu. Dibuat dengan ❤️ untuk anak-anak Indonesia.</p>
+    </div>
+  </footer>
+</BaseLayout>
+
+<style>
+  /* Navbar */
+  .navbar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 100;
+    background: rgba(15, 23, 42, 0.85);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--color-border);
+    padding: var(--space-sm) 0;
+  }
+
+  .navbar-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 3.5rem;
+  }
+
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    font-family: var(--font-heading);
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: var(--color-text);
+    text-decoration: none;
+  }
+
+  .logo-icon { font-size: 1.75rem; }
+
+  .nav-actions {
+    display: flex;
+    gap: var(--space-sm);
+  }
+
+  /* Hero */
+  .hero {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    padding-top: 5rem;
+    background: var(--gradient-hero);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -20%;
+    width: 600px;
+    height: 600px;
+    background: radial-gradient(circle, rgba(99, 102, 241, 0.15), transparent 70%);
+    border-radius: 50%;
+  }
+
+  .hero-inner {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-3xl);
+    align-items: center;
+  }
+
+  .hero-title {
+    font-size: 3.2rem;
+    font-weight: 800;
+    line-height: 1.15;
+    margin: var(--space-lg) 0;
+  }
+
+  .hero-subtitle {
+    font-size: 1.15rem;
+    color: var(--color-text-muted);
+    max-width: 500px;
+    line-height: 1.7;
+  }
+
+  .hero-actions {
+    display: flex;
+    gap: var(--space-md);
+    margin-top: var(--space-xl);
+    flex-wrap: wrap;
+  }
+
+  .hero-stats {
+    display: flex;
+    align-items: center;
+    gap: var(--space-lg);
+    margin-top: var(--space-2xl);
+  }
+
+  .stat { text-align: center; }
+  .stat-number {
+    display: block;
+    font-family: var(--font-heading);
+    font-size: 2rem;
+    font-weight: 800;
+    color: var(--color-primary-light);
+  }
+  .stat-label {
+    font-size: 0.85rem;
+    color: var(--color-text-muted);
+  }
+  .stat-divider {
+    width: 1px;
+    height: 40px;
+    background: var(--color-border);
+  }
+
+  /* Floating cards */
+  .hero-visual {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+  }
+
+  .hero-card-stack {
+    position: relative;
+    width: 350px;
+    height: 400px;
+  }
+
+  .floating-card {
+    position: absolute;
+    background: var(--color-bg-card);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    padding: var(--space-sm) var(--space-lg);
+    font-weight: 600;
+    font-size: 1rem;
+    box-shadow: var(--shadow-lg);
+    white-space: nowrap;
+  }
+
+  .fc-1 { top: 0; left: 10%; }
+  .fc-2 { top: 15%; right: 0; }
+  .fc-3 { top: 40%; left: 0; }
+  .fc-4 { top: 55%; right: 5%; }
+  .fc-5 { top: 70%; left: 15%; }
+  .fc-6 { top: 85%; right: 10%; }
+
+  /* Categories */
+  .categories-section {
+    padding: var(--space-3xl) 0;
+  }
+
+  .section-title {
+    font-size: 2.2rem;
+    font-weight: 800;
+  }
+
+  .section-subtitle {
+    font-size: 1.05rem;
+    margin-top: var(--space-sm);
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .category-card {
+    background: var(--color-bg-card);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    padding: var(--space-xl);
+    transition: all var(--transition-base);
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .category-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: var(--card-color);
+    transform: scaleX(0);
+    transition: transform var(--transition-base);
+  }
+
+  .category-card:hover::before {
+    transform: scaleX(1);
+  }
+
+  .category-card:hover {
+    border-color: var(--card-color);
+    box-shadow: 0 0 20px color-mix(in srgb, var(--card-color) 20%, transparent);
+    transform: translateY(-4px);
+  }
+
+  .category-icon {
+    font-size: 2.5rem;
+    margin-bottom: var(--space-md);
+  }
+
+  .category-card h3 {
+    font-size: 1.2rem;
+    margin-bottom: var(--space-sm);
+  }
+
+  .category-card p {
+    color: var(--color-text-muted);
+    font-size: 0.9rem;
+    margin-bottom: var(--space-md);
+    line-height: 1.5;
+  }
+
+  /* Age Groups */
+  .age-section {
+    padding: var(--space-3xl) 0;
+    background: rgba(30, 41, 59, 0.3);
+  }
+
+  .age-groups {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--space-lg);
+  }
+
+  .age-card {
+    border-radius: var(--radius-xl);
+    padding: var(--space-2xl);
+    text-align: center;
+    transition: all var(--transition-base);
+    border: 2px solid transparent;
+  }
+
+  .age-card:hover {
+    transform: translateY(-6px);
+  }
+
+  .age-explorers {
+    background: linear-gradient(135deg, rgba(245, 158, 11, 0.1), rgba(249, 115, 22, 0.05));
+    border-color: rgba(245, 158, 11, 0.2);
+  }
+  .age-explorers:hover { border-color: #f59e0b; box-shadow: 0 0 30px rgba(245, 158, 11, 0.2); }
+
+  .age-builders {
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(139, 92, 246, 0.05));
+    border-color: rgba(99, 102, 241, 0.2);
+  }
+  .age-builders:hover { border-color: #6366f1; box-shadow: 0 0 30px rgba(99, 102, 241, 0.2); }
+
+  .age-challengers {
+    background: linear-gradient(135deg, rgba(6, 182, 212, 0.1), rgba(59, 130, 246, 0.05));
+    border-color: rgba(6, 182, 212, 0.2);
+  }
+  .age-challengers:hover { border-color: #06b6d4; box-shadow: 0 0 30px rgba(6, 182, 212, 0.2); }
+
+  .age-emoji { font-size: 3rem; margin-bottom: var(--space-md); }
+
+  .age-card h3 {
+    font-size: 1.5rem;
+    margin-bottom: var(--space-xs);
+  }
+
+  .age-range {
+    display: inline-block;
+    font-size: 0.9rem;
+    color: var(--color-text-muted);
+    margin-bottom: var(--space-lg);
+  }
+
+  .age-features {
+    list-style: none;
+    text-align: left;
+  }
+
+  .age-features li {
+    padding: var(--space-xs) 0;
+    font-size: 0.95rem;
+    color: var(--color-text-muted);
+  }
+
+  /* CTA */
+  .cta-section {
+    padding: var(--space-3xl) 0;
+  }
+
+  .cta-card {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: var(--space-3xl);
+  }
+
+  .cta-card h2 {
+    font-size: 2rem;
+  }
+
+  /* Footer */
+  .footer {
+    padding: var(--space-xl) 0;
+    border-top: 1px solid var(--color-border);
+  }
+
+  @media (max-width: 768px) {
+    .hero-inner {
+      grid-template-columns: 1fr;
+      text-align: center;
+    }
+
+    .hero-title { font-size: 2rem; }
+    .hero-subtitle { max-width: 100%; }
+    .hero-actions { justify-content: center; }
+    .hero-stats { justify-content: center; }
+    .hero-visual { display: none; }
+
+    .age-groups { grid-template-columns: 1fr; }
+
+    .nav-actions .btn-secondary { display: none; }
+  }
+</style>

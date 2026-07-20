@@ -1,0 +1,25 @@
+# EzEdu — Development Caddyfile
+# Run with: caddy run --config deploy/Caddyfile.dev
+
+:3000 {
+	# Static assets from Astro build output
+	handle /static/* {
+		root * ../frontend/dist
+		file_server
+		header Cache-Control "public, max-age=3600"
+	}
+
+	# API reverse proxy to Go backend
+	handle /api/* {
+		reverse_proxy localhost:8080
+	}
+
+	# Serve Astro SSG pages
+	handle {
+		root * ../frontend/dist
+		try_files {path} {path}.html /index.html
+		file_server
+	}
+
+	encode gzip
+}

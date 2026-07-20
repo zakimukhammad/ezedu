@@ -1,0 +1,258 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Dashboard from '../components/Dashboard.tsx';
+---
+
+<BaseLayout title="Beranda" description="Beranda belajar EzEdu — pilih kategori dan mulai belajar">
+  <Dashboard client:load />
+</BaseLayout>
+
+<style is:global>
+  /* Dashboard Styles */
+  .dashboard {
+    min-height: 100vh;
+    background: var(--color-bg);
+    padding-bottom: var(--space-3xl);
+  }
+
+  .dashboard-loading {
+    min-height: 100vh;
+    flex-direction: column;
+    gap: var(--space-md);
+    color: var(--color-text-muted);
+  }
+
+  /* Dashboard Nav */
+  .dash-nav {
+    background: rgba(15, 23, 42, 0.9);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--color-border);
+    padding: var(--space-sm) var(--space-lg);
+    position: sticky;
+    top: 0;
+    z-index: 50;
+  }
+
+  .dash-nav-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 3rem;
+  }
+
+  .dash-logo {
+    font-family: var(--font-heading);
+    font-size: 1.3rem;
+    font-weight: 800;
+  }
+
+  .dash-nav-right {
+    display: flex;
+    gap: var(--space-sm);
+  }
+
+  .btn-ghost {
+    background: none;
+    border: none;
+    color: var(--color-text-muted);
+    font-family: var(--font-body);
+    font-size: 0.9rem;
+    cursor: pointer;
+    padding: var(--space-xs) var(--space-sm);
+    border-radius: var(--radius-sm);
+    transition: all var(--transition-fast);
+  }
+
+  .btn-ghost:hover {
+    color: var(--color-text);
+    background: var(--color-bg-elevated);
+  }
+
+  /* Welcome */
+  .dash-welcome {
+    max-width: 1200px;
+    margin: var(--space-xl) auto;
+    padding: var(--space-xl) var(--space-lg);
+    background: var(--color-bg-card);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-xl);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: var(--space-lg);
+  }
+
+  .welcome-left {
+    display: flex;
+    align-items: center;
+    gap: var(--space-lg);
+  }
+
+  .welcome-avatar {
+    font-size: 3rem;
+    width: 5rem;
+    height: 5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(99, 102, 241, 0.1);
+    border-radius: var(--radius-full);
+  }
+
+  .welcome-name {
+    font-size: 1.5rem;
+    font-weight: 800;
+  }
+
+  .welcome-greeting {
+    color: var(--color-text-muted);
+    margin-top: var(--space-xs);
+  }
+
+  .welcome-stats {
+    display: flex;
+    gap: var(--space-xl);
+  }
+
+  .welcome-stat {
+    text-align: center;
+  }
+
+  .welcome-stat-value {
+    display: block;
+    font-size: 1.1rem;
+    font-weight: 700;
+  }
+
+  .welcome-stat-label {
+    font-size: 0.8rem;
+    color: var(--color-text-muted);
+  }
+
+  /* Content */
+  .dash-content {
+    max-width: 1200px;
+    margin: var(--space-2xl) auto;
+    padding: 0 var(--space-lg);
+  }
+
+  .dash-section-title {
+    font-size: 1.4rem;
+    margin-bottom: var(--space-lg);
+  }
+
+  .category-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: var(--space-lg);
+  }
+
+  .dash-category-card {
+    background: var(--color-bg-card);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    padding: var(--space-xl);
+    text-decoration: none;
+    color: var(--color-text);
+    transition: all var(--transition-base);
+    position: relative;
+    overflow: hidden;
+    display: block;
+  }
+
+  .dash-category-card::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: var(--cat-color);
+    transform: scaleX(0);
+    transition: transform var(--transition-base);
+  }
+
+  .dash-category-card:hover {
+    border-color: var(--cat-color);
+    box-shadow: 0 0 20px color-mix(in srgb, var(--cat-color) 15%, transparent);
+    transform: translateY(-4px);
+  }
+
+  .dash-category-card:hover::after {
+    transform: scaleX(1);
+  }
+
+  .dash-cat-icon {
+    font-size: 2.5rem;
+    margin-bottom: var(--space-md);
+  }
+
+  .dash-cat-name {
+    font-size: 1.2rem;
+    margin-bottom: var(--space-sm);
+  }
+
+  .dash-cat-desc {
+    color: var(--color-text-muted);
+    font-size: 0.9rem;
+    line-height: 1.5;
+    margin-bottom: var(--space-md);
+  }
+
+  .dash-cat-cta {
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: var(--color-primary-light);
+    transition: color var(--transition-fast);
+  }
+
+  .dash-category-card:hover .dash-cat-cta {
+    color: var(--color-primary);
+  }
+
+  /* Tip */
+  .dash-tip {
+    max-width: 1200px;
+    margin: var(--space-2xl) auto;
+    padding: 0 var(--space-lg);
+  }
+
+  .tip-card {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-md);
+    background: rgba(99, 102, 241, 0.08);
+    border: 1px solid rgba(99, 102, 241, 0.15);
+    border-radius: var(--radius-lg);
+    padding: var(--space-lg);
+  }
+
+  .tip-icon {
+    font-size: 1.5rem;
+    flex-shrink: 0;
+  }
+
+  .tip-card p {
+    color: var(--color-text-muted);
+    font-size: 0.9rem;
+    margin-top: var(--space-xs);
+  }
+
+  @media (max-width: 768px) {
+    .dash-welcome {
+      flex-direction: column;
+      text-align: center;
+    }
+
+    .welcome-left {
+      flex-direction: column;
+    }
+
+    .category-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

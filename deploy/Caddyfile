@@ -1,0 +1,44 @@
+# EzEdu — Production Caddyfile
+# Deploy: caddy run --config /opt/ezedu/Caddyfile
+
+{$EZEDU_DOMAIN:ezedu.example.com} {
+	# Static assets with aggressive caching
+	handle /static/* {
+		root * /opt/ezedu/public
+		file_server
+		header Cache-Control "public, max-age=31536000, immutable"
+	}
+
+	# API reverse proxy
+	handle /api/* {
+		reverse_proxy localhost:8080
+	}
+
+	# SSG pages
+	handle {
+		root * /opt/ezedu/public
+		try_files {path} {path}.html /index.html
+		file_server
+	}
+
+	# Compression
+	encode gzip zstd
+
+	# Security headers
+	header {
+		X-Content-Type-Options nosniff
+		X-Frame-Options DENY
+		Referrer-Policy strict-origin-when-cross-origin
+		Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'"
+	}
+
+	# Rate limiting for auth
+	@auth path /api/auth/*
+	rate_limit @auth {
+		zone auth_zone {
+			key {remote_host}
+			events 10
+			window 1m
+		}
+	}
+}

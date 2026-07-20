@@ -1,0 +1,222 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import ProfileSelector from '../components/ProfileSelector.tsx';
+---
+
+<BaseLayout title="Pilih Profil" description="Pilih profil anak untuk mulai belajar">
+  <div class="profile-page">
+    <div class="profile-container animate-fade-in">
+      <a href="/" class="auth-logo" id="profile-logo">
+        <span class="logo-icon">🎓</span>
+        <span class="logo-text">Ez<span class="text-gradient">Edu</span></span>
+      </a>
+      <ProfileSelector client:load />
+    </div>
+  </div>
+</BaseLayout>
+
+<style>
+  .profile-page {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--space-xl);
+    background: var(--gradient-hero);
+  }
+
+  .profile-container {
+    width: 100%;
+    max-width: 700px;
+    text-align: center;
+  }
+
+  .auth-logo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-sm);
+    font-family: var(--font-heading);
+    font-size: 1.75rem;
+    font-weight: 800;
+    color: var(--color-text);
+    text-decoration: none;
+    margin-bottom: var(--space-2xl);
+  }
+
+  .logo-icon { font-size: 2rem; }
+</style>
+
+<style is:global>
+  /* Profile Selector Styles */
+  .profile-title {
+    font-size: 1.6rem;
+    margin-bottom: var(--space-xl);
+  }
+
+  .profile-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: var(--space-lg);
+    justify-items: center;
+  }
+
+  .profile-card {
+    background: var(--color-bg-card);
+    border: 2px solid var(--color-border);
+    border-radius: var(--radius-xl);
+    padding: var(--space-xl) var(--space-lg);
+    cursor: pointer;
+    transition: all var(--transition-base);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-sm);
+    width: 100%;
+    max-width: 180px;
+    font-family: var(--font-body);
+    color: var(--color-text);
+  }
+
+  .profile-card:hover {
+    border-color: var(--color-primary);
+    box-shadow: var(--shadow-glow-primary);
+    transform: translateY(-6px) scale(1.02);
+  }
+
+  .profile-avatar {
+    font-size: 3rem;
+    width: 5rem;
+    height: 5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(99, 102, 241, 0.1);
+    border-radius: var(--radius-full);
+  }
+
+  .profile-name {
+    font-weight: 700;
+    font-size: 1rem;
+  }
+
+  .profile-stats {
+    display: flex;
+    gap: var(--space-sm);
+    font-size: 0.8rem;
+    color: var(--color-text-muted);
+  }
+
+  .profile-streak {
+    font-size: 0.75rem;
+    color: var(--color-secondary);
+  }
+
+  .profile-add {
+    border-style: dashed;
+    border-color: var(--color-text-subtle);
+    opacity: 0.7;
+  }
+
+  .profile-add:hover {
+    opacity: 1;
+    border-color: var(--color-primary);
+  }
+
+  .add-avatar {
+    font-size: 2rem;
+    color: var(--color-text-subtle);
+    background: rgba(100, 116, 139, 0.1);
+  }
+
+  .profile-loading {
+    flex-direction: column;
+    gap: var(--space-md);
+    padding: var(--space-3xl);
+    color: var(--color-text-muted);
+  }
+
+  .loading-spinner {
+    width: 40px;
+    height: 40px;
+    border: 3px solid var(--color-border);
+    border-top: 3px solid var(--color-primary);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+
+  /* Modal */
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 200;
+    padding: var(--space-lg);
+  }
+
+  .modal-content {
+    background: var(--color-bg-card);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-xl);
+    padding: var(--space-2xl);
+    max-width: 440px;
+    width: 100%;
+    box-shadow: var(--shadow-lg);
+  }
+
+  .modal-content h3 {
+    font-size: 1.3rem;
+    margin-bottom: var(--space-xl);
+    text-align: center;
+  }
+
+  .modal-actions {
+    display: flex;
+    gap: var(--space-md);
+    margin-top: var(--space-lg);
+  }
+
+  .modal-actions .btn {
+    flex: 1;
+  }
+
+  /* Avatar picker */
+  .avatar-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: var(--space-sm);
+  }
+
+  .avatar-option {
+    font-size: 2rem;
+    width: 3.5rem;
+    height: 3.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--color-bg);
+    border: 2px solid var(--color-border);
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+  }
+
+  .avatar-option:hover {
+    border-color: var(--color-primary-light);
+    transform: scale(1.1);
+  }
+
+  .avatar-selected {
+    border-color: var(--color-primary);
+    background: rgba(99, 102, 241, 0.15);
+    box-shadow: 0 0 10px rgba(99, 102, 241, 0.3);
+  }
+</style>

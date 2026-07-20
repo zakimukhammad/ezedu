@@ -45,12 +45,17 @@ func main() {
 	if err := store.SeedDefaults(db); err != nil {
 		log.Fatalf("Failed to seed defaults: %v", err)
 	}
+	if err := store.SeedCurriculum(db); err != nil {
+		log.Printf("Warning: Failed to seed curriculum: %v", err)
+	}
 
 	// Initialize stores
 	accountStore := store.NewAccountStore(db)
 	sessionStore := store.NewSessionStore(db)
 	childStore := store.NewChildStore(db)
 	categoryStore := store.NewCategoryStore(db)
+	lessonStore := store.NewLessonStore(db)
+	progressStore := store.NewProgressStore(db)
 
 	// Initialize auth service
 	authService := auth.NewService(accountStore, sessionStore)
@@ -59,6 +64,7 @@ func main() {
 	authHandler := handler.NewAuthHandler(authService)
 	childHandler := handler.NewChildHandler(childStore)
 	categoryHandler := handler.NewCategoryHandler(categoryStore)
+	lessonHandler := handler.NewLessonHandler(lessonStore, categoryStore, progressStore, childStore)
 
 	// Build router
 	r := chi.NewRouter()
@@ -91,6 +97,12 @@ func main() {
 
 			// Categories
 			r.Get("/categories", categoryHandler.List)
+
+			// Lessons & Activities
+			r.Get("/categories/{slug}/lessons", lessonHandler.ListByCategory)
+			r.Get("/lessons/{id}", lessonHandler.GetByID)
+			r.Post("/activities/{id}/submit", lessonHandler.SubmitActivity)
+			r.Post("/lessons/{id}/complete", lessonHandler.CompleteLesson)
 		})
 	})
 

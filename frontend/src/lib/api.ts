@@ -81,3 +81,40 @@ export const categoriesApi = {
   list: () =>
     request('/categories'),
 };
+
+// Lessons API
+export const lessonsApi = {
+  listByCategory: (categorySlug: string, ageGroup: string = 'builders', childId?: number) => {
+    let url = `/categories/${categorySlug}/lessons?age_group=${ageGroup}`;
+    if (childId) url += `&child_id=${childId}`;
+    return request(url);
+  },
+
+  getById: (id: number) =>
+    request(`/lessons/${id}`),
+
+  complete: (lessonId: number, childId: number, finalScore: number, maxScore: number, timeSpentSec: number) =>
+    request(`/lessons/${lessonId}/complete`, {
+      method: 'POST',
+      body: JSON.stringify({
+        child_id: childId,
+        final_score: finalScore,
+        max_score: maxScore,
+        time_spent_sec: timeSpentSec,
+      }),
+    }),
+};
+
+// Activities API
+export const activitiesApi = {
+  submit: (activityId: number, childId: number, answer: any, attemptNo: number = 1) =>
+    request(`/activities/${activityId}/submit`, {
+      method: 'POST',
+      body: JSON.stringify({
+        child_id: childId,
+        answer,
+        attempt_no: attemptNo,
+      }),
+    }),
+};
+

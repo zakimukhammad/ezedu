@@ -671,6 +671,66 @@ func SeedCurriculum(db *sql.DB) error {
 		)
 	}
 
-	fmt.Println("Seeded Math, Coding, Toddler, Science, Language, and Logic curriculum content")
+	// ==========================================
+	// ART LESSONS (BUILDERS: L1 - L3)
+	// ==========================================
+	var artCatID int64
+	err = db.QueryRow(`SELECT id FROM categories WHERE slug = 'art'`).Scan(&artCatID)
+	if err == nil && artCatID > 0 {
+		// Lesson 36: Warna Dasar & Lukisan Kreasi
+		_, _ = db.Exec(
+			`INSERT OR IGNORE INTO lessons (id, category_id, age_group, level, sort_order, title, description, content_json, estimated_minutes, xp_reward)
+			 VALUES (36, ?, 'builders', 1, 1, 'Warna Dasar & Lukisan Kreasi', 'Mengenal warna dasar dan melukis pada kanvas digital', 
+			 '{"intro_text":"Gunakan imajinasi dan kuas warnamu untuk membuat karya indah!","icon":"🎨"}', 10, 20)`,
+			artCatID,
+		)
+		_, _ = db.Exec(
+			`INSERT OR IGNORE INTO activities (id, lesson_id, type, sort_order, question_json, max_score)
+			 VALUES (36, 36, 'drawing', 1, ?, 10)`,
+			`{
+				"prompt": "Gunakan kuas dan stempel stiker untuk melukis pemandangan indahmu! 🎨",
+				"hint": "Pilih warna dan stempel bintang atau pelangi!",
+				"explanation": "Karya seni melukis yang luar biasa!"
+			}`,
+		)
+
+		// Lesson 37: Seni Pixel & Pola Gambar
+		_, _ = db.Exec(
+			`INSERT OR IGNORE INTO lessons (id, category_id, age_group, level, sort_order, title, description, content_json, estimated_minutes, xp_reward)
+			 VALUES (37, ?, 'builders', 2, 1, 'Seni Pixel & Pola Gambar', 'Membuat gambar retro 8x8 menggunakan seni pixel', 
+			 '{"intro_text":"Seni pixel dibentuk dari kotak-kotak kecil berwarna yang tersusun rapi!","icon":"👾"}', 12, 25)`,
+			artCatID,
+		)
+		_, _ = db.Exec(
+			`INSERT OR IGNORE INTO activities (id, lesson_id, type, sort_order, question_json, max_score)
+			 VALUES (37, 37, 'pixel_art', 1, ?, 10)`,
+			`{
+				"prompt": "Warnai grid pixel di bawah untuk membuat emoji atau karakter retro favoritmu! 👾",
+				"hint": "Sentuh setiap kotak pixel untuk memberi warna!",
+				"explanation": "Sangat kreatif! Karakter pixel art buatanmu sungguh menarik."
+			}`,
+		)
+
+		// Lesson 38: Warna Komplementer & Roda Warna
+		_, _ = db.Exec(
+			`INSERT OR IGNORE INTO lessons (id, category_id, age_group, level, sort_order, title, description, content_json, estimated_minutes, xp_reward)
+			 VALUES (38, ?, 'builders', 3, 1, 'Campuran & Roda Warna', 'Pelajari hasil pencampuran dua warna dasar', 
+			 '{"intro_text":"Mencampurkan dua warna primer akan menghasilkan warna sekunder yang baru!","icon":"🌈"}', 15, 30)`,
+			artCatID,
+		)
+		_, _ = db.Exec(
+			`INSERT OR IGNORE INTO activities (id, lesson_id, type, sort_order, question_json, max_score)
+			 VALUES (38, 38, 'multiple_choice', 1, ?, 10)`,
+			`{
+				"prompt": "Pencampuran warna Merah 🔴 dan Kuning 🟡 akan menghasilkan warna apa?",
+				"options": ["Oranye 🟧", "Hijau 🟩", "Ungu 🟪"],
+				"answer": "Oranye 🟧",
+				"hint": "Pikirkan warna buah Jeruk!",
+				"explanation": "Merah + Kuning = Oranye 🟧."
+			}`,
+		)
+	}
+
+	fmt.Println("Seeded Math, Coding, Toddler, Science, Language, Logic, and Art curriculum content")
 	return nil
 }

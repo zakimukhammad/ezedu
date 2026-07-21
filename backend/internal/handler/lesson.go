@@ -186,6 +186,10 @@ func (h *LessonHandler) SubmitActivity(w http.ResponseWriter, r *http.Request) {
 				score = activity.MaxScore
 			}
 		}
+
+	case "drawing", "pixel_art":
+		isCorrect = true
+		score = activity.MaxScore
 	}
 
 	if req.AttemptNo == 0 {

@@ -3,6 +3,8 @@ import { lessonsApi, activitiesApi } from '../lib/api';
 import { sounds } from '../lib/sound';
 import BlockCodingEngine from './BlockCodingEngine';
 import ToddlerEngine from './ToddlerEngine';
+import CanvasDrawingEngine from './CanvasDrawingEngine';
+import PixelArtEngine from './PixelArtEngine';
 
 interface Activity {
   id: number;
@@ -198,48 +200,79 @@ export default function QuizEngine({ lessonId }: Props) {
       setCurrentIndex(nextIdx);
       initActivityState(activities[nextIdx]);
     } else {
-      finishLesson();
+      finishLessonWithScore(totalScore, child);
     }
   };
 
-  const finishLesson = async () => {
-    if (!lesson || !child) return;
-
-    const timeSpentSec = Math.round((Date.now() - startTime) / 1000);
-    const { data } = await lessonsApi.complete(
-      lesson.id,
-      child.id,
-      totalScore,
-      maxPossibleScore,
-      timeSpentSec
-    );
-
-    setXpEarned(data?.xp_earned || lesson.xp_reward);
-
-    // Handle badge awards
-    if (data?.badges_awarded && data.badges_awarded.length > 0) {
-      setAwardedBadges(data.badges_awarded);
+  const handleCreativeComplete = async (score: number) => {
+    let activeChild = child;
+    if (!activeChild) {
+      try {
+        const stored = sessionStorage.getItem('ezedu_child');
+        if (stored) activeChild = JSON.parse(stored);
+      } catch (e) {}
     }
 
-    // Refresh child data in sessionStorage (updated XP, level, streak) & check Level-Up
-    try {
-      const stored = sessionStorage.getItem('ezedu_child');
-      if (stored) {
-        const childData = JSON.parse(stored);
-        const oldLevel = childData.current_level || 1;
-        const newXp = (childData.xp_total || 0) + (data?.xp_earned || 0);
-        const calculatedNewLevel = 1 + Math.floor(newXp / 100);
+    if (currentActivity && activeChild) {
+      try {
+        await activitiesApi.submit(currentActivity.id, activeChild.id, 'creative_completed', 1);
+      } catch (e) {}
+    }
 
-        childData.xp_total = newXp;
-        childData.current_level = calculatedNewLevel;
-        sessionStorage.setItem('ezedu_child', JSON.stringify(childData));
+    const calculatedTotalScore = totalScore + score;
+    setTotalScore(calculatedTotalScore);
 
-        if (calculatedNewLevel > oldLevel) {
-          setLeveledUp(true);
-          setNewLevel(calculatedNewLevel);
+    if (currentIndex + 1 < activities.length) {
+      const nextIdx = currentIndex + 1;
+      setCurrentIndex(nextIdx);
+      initActivityState(activities[nextIdx]);
+    } else {
+      finishLessonWithScore(calculatedTotalScore, activeChild);
+    }
+  };
+
+  const finishLessonWithScore = async (finalScore: number, activeChild: Child | null) => {
+    if (!lesson) return;
+
+    if (activeChild) {
+      try {
+        const timeSpentSec = Math.round((Date.now() - startTime) / 1000);
+        const { data } = await lessonsApi.complete(
+          lesson.id,
+          activeChild.id,
+          finalScore,
+          maxPossibleScore || 10,
+          timeSpentSec
+        );
+
+        setXpEarned(data?.xp_earned || lesson.xp_reward);
+
+        if (data?.badges_awarded && data.badges_awarded.length > 0) {
+          setAwardedBadges(data.badges_awarded);
         }
+
+        const stored = sessionStorage.getItem('ezedu_child');
+        if (stored) {
+          const childData = JSON.parse(stored);
+          const oldLevel = childData.current_level || 1;
+          const newXp = (childData.xp_total || 0) + (data?.xp_earned || 0);
+          const calculatedNewLevel = 1 + Math.floor(newXp / 100);
+
+          childData.xp_total = newXp;
+          childData.current_level = calculatedNewLevel;
+          sessionStorage.setItem('ezedu_child', JSON.stringify(childData));
+
+          if (calculatedNewLevel > oldLevel) {
+            setLeveledUp(true);
+            setNewLevel(calculatedNewLevel);
+          }
+        }
+      } catch (e) {
+        console.warn('Lesson completion API call error:', e);
       }
-    } catch(e) {}
+    } else {
+      setXpEarned(lesson.xp_reward);
+    }
 
     sounds.playFanfare();
     setCompleted(true);
@@ -336,10 +369,7 @@ export default function QuizEngine({ lessonId }: Props) {
         </div>
         <ToddlerEngine
           activity={currentActivity}
-          onComplete={(score) => {
-            setTotalScore((prev) => prev + score);
-            handleNextActivity();
-          }}
+          onComplete={(score) => handleCreativeComplete(score)}
         />
       </div>
     );
@@ -375,6 +405,10 @@ export default function QuizEngine({ lessonId }: Props) {
             ? '✏️ Ketik Jawaban'
             : currentActivity.type === 'block_code'
             ? '🤖 Blok Koding'
+            : currentActivity.type === 'drawing'
+            ? '🎨 Lukisan Kreatif'
+            : currentActivity.type === 'pixel_art'
+            ? '👾 Seni Pixel'
             : '🧩 Seret & Urutkan'}
         </div>
 
@@ -473,6 +507,22 @@ export default function QuizEngine({ lessonId }: Props) {
           </div>
         )}
 
+        {/* Canvas Drawing Component */}
+        {currentActivity.type === 'drawing' && (
+          <CanvasDrawingEngine
+            activity={currentActivity}
+            onComplete={(score) => handleCreativeComplete(score)}
+          />
+        )}
+
+        {/* Pixel Art Component */}
+        {currentActivity.type === 'pixel_art' && (
+          <PixelArtEngine
+            activity={currentActivity}
+            onComplete={(score) => handleCreativeComplete(score)}
+          />
+        )}
+
         {/* Instant Feedback Panel */}
         {feedback && (
           <div class={`feedback-panel mt-xl ${feedback.isCorrect ? 'feedback-success' : 'feedback-wrong'} animate-slide-up`}>
@@ -500,31 +550,33 @@ export default function QuizEngine({ lessonId }: Props) {
         )}
 
         {/* Submit & Navigation Buttons */}
-        <div class="quiz-footer mt-xl">
-          {!submitted || (feedback && !feedback.isCorrect) ? (
-            <button
-              class="btn btn-primary btn-lg w-full"
-              disabled={
-                submitting ||
-                (currentActivity.type === 'multiple_choice' && !selectedChoice) ||
-                (currentActivity.type === 'fill_blank' && !fillAnswer.trim()) ||
-                (currentActivity.type === 'block_code' && blockAnswer.length === 0)
-              }
-              onClick={handleSubmit}
-              id="quiz-submit-btn"
-            >
-              {submitting ? 'Memeriksa...' : (attemptCount > 1 ? 'Coba Lagi 🚀' : 'Jawab Now 🚀')}
-            </button>
-          ) : (
-            <button
-              class="btn btn-primary btn-lg w-full animate-bounce"
-              onClick={handleNextActivity}
-              id="quiz-next-btn"
-            >
-              {currentIndex + 1 < activities.length ? 'Soal Berikutnya ➔' : 'Selesaikan Pelajaran 🎉'}
-            </button>
-          )}
-        </div>
+        {currentActivity.type !== 'drawing' && currentActivity.type !== 'pixel_art' && (
+          <div class="quiz-footer mt-xl">
+            {!submitted || (feedback && !feedback.isCorrect) ? (
+              <button
+                class="btn btn-primary btn-lg w-full"
+                disabled={
+                  submitting ||
+                  (currentActivity.type === 'multiple_choice' && !selectedChoice) ||
+                  (currentActivity.type === 'fill_blank' && !fillAnswer.trim()) ||
+                  (currentActivity.type === 'block_code' && blockAnswer.length === 0)
+                }
+                onClick={handleSubmit}
+                id="quiz-submit-btn"
+              >
+                {submitting ? 'Memeriksa...' : (attemptCount > 1 ? 'Coba Lagi 🚀' : 'Jawab Now 🚀')}
+              </button>
+            ) : (
+              <button
+                class="btn btn-primary btn-lg w-full animate-bounce"
+                onClick={handleNextActivity}
+                id="quiz-next-btn"
+              >
+                {currentIndex + 1 < activities.length ? 'Soal Berikutnya ➔' : 'Selesaikan Pelajaran 🎉'}
+              </button>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );

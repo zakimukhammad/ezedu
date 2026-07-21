@@ -85,7 +85,7 @@ func Migrate(db *sql.DB) error {
 		`CREATE TABLE IF NOT EXISTS activities (
 			id INTEGER PRIMARY KEY AUTOINCREMENT,
 			lesson_id INTEGER NOT NULL REFERENCES lessons(id) ON DELETE CASCADE,
-			type TEXT NOT NULL CHECK(type IN ('multiple_choice', 'drag_drop', 'fill_blank', 'matching', 'sequencing', 'drawing', 'block_code', 'timed')),
+			type TEXT NOT NULL CHECK(type IN ('multiple_choice', 'drag_drop', 'fill_blank', 'matching', 'sequencing', 'drawing', 'pixel_art', 'block_code', 'timed')),
 			sort_order INTEGER DEFAULT 0,
 			question_json TEXT NOT NULL DEFAULT '{}',
 			max_score INTEGER DEFAULT 10
@@ -201,6 +201,24 @@ func Migrate(db *sql.DB) error {
 		_, _ = db.Exec(`INSERT INTO lessons_new SELECT * FROM lessons;`)
 		_, _ = db.Exec(`DROP TABLE lessons;`)
 		_, _ = db.Exec(`ALTER TABLE lessons_new RENAME TO lessons;`)
+		_, _ = db.Exec(`PRAGMA foreign_keys=ON;`)
+	}
+
+	var activitiesDDL string
+	err = db.QueryRow(`SELECT sql FROM sqlite_master WHERE type='table' AND name='activities'`).Scan(&activitiesDDL)
+	if err == nil && !strings.Contains(activitiesDDL, "pixel_art") {
+		_, _ = db.Exec(`PRAGMA foreign_keys=OFF;`)
+		_, _ = db.Exec(`CREATE TABLE activities_new (
+			id INTEGER PRIMARY KEY AUTOINCREMENT,
+			lesson_id INTEGER NOT NULL REFERENCES lessons(id) ON DELETE CASCADE,
+			type TEXT NOT NULL CHECK(type IN ('multiple_choice', 'drag_drop', 'fill_blank', 'matching', 'sequencing', 'drawing', 'pixel_art', 'block_code', 'timed')),
+			sort_order INTEGER DEFAULT 0,
+			question_json TEXT NOT NULL DEFAULT '{}',
+			max_score INTEGER DEFAULT 10
+		);`)
+		_, _ = db.Exec(`INSERT INTO activities_new SELECT * FROM activities;`)
+		_, _ = db.Exec(`DROP TABLE activities;`)
+		_, _ = db.Exec(`ALTER TABLE activities_new RENAME TO activities;`)
 		_, _ = db.Exec(`PRAGMA foreign_keys=ON;`)
 	}
 

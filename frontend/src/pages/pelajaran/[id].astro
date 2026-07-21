@@ -3,7 +3,7 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import QuizEngine from '../../components/QuizEngine.tsx';
 
 export function getStaticPaths() {
-  return Array.from({ length: 35 }, (_, i) => ({ params: { id: String(i + 1) } }));
+  return Array.from({ length: 38 }, (_, i) => ({ params: { id: String(i + 1) } }));
 }
 
 const { id } = Astro.params;

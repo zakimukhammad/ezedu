@@ -3,9 +3,32 @@
 
 class SoundEngine {
   private ctx: AudioContext | null = null;
+  private muted: boolean = false;
+
+  constructor() {
+    if (typeof window !== 'undefined') {
+      this.muted = localStorage.getItem('ezedu_muted') === 'true';
+    }
+  }
+
+  isMuted(): boolean {
+    return this.muted;
+  }
+
+  setMuted(muted: boolean) {
+    this.muted = muted;
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('ezedu_muted', String(muted));
+    }
+  }
+
+  toggleMuted(): boolean {
+    this.setMuted(!this.muted);
+    return this.muted;
+  }
 
   private getContext(): AudioContext | null {
-    if (typeof window === 'undefined') return null;
+    if (this.muted || typeof window === 'undefined') return null;
     if (!this.ctx) {
       const AudioCtx = window.AudioContext || (window as any).webkitAudioContext;
       if (AudioCtx) {

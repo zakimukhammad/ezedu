@@ -124,6 +124,51 @@ func (s *Service) Logout(token string) error {
 	return s.sessions.Delete(token)
 }
 
+// GetAccountByID retrieves account details by ID.
+func (s *Service) GetAccountByID(id int64) (*model.Account, error) {
+	return s.accounts.GetByID(id)
+}
+
+// SetPIN sets or updates a 4-digit Parent PIN.
+func (s *Service) SetPIN(accountID int64, pin string) error {
+	pin = strings.TrimSpace(pin)
+	if len(pin) != 4 {
+		return fmt.Errorf("PIN orang tua harus 4 digit angka")
+	}
+	for _, ch := range pin {
+		if ch < '0' || ch > '9' {
+			return fmt.Errorf("PIN orang tua harus berupa angka")
+		}
+	}
+
+	hash, err := bcrypt.GenerateFromPassword([]byte(pin), bcrypt.DefaultCost)
+	if err != nil {
+		return fmt.Errorf("gagal mengenkripsi PIN: %w", err)
+	}
+
+	return s.accounts.UpdatePIN(accountID, string(hash))
+}
+
+// VerifyPIN verifies the provided 4-digit Parent PIN against the stored hash.
+func (s *Service) VerifyPIN(accountID int64, pin string) (bool, error) {
+	account, err := s.accounts.GetByID(accountID)
+	if err != nil || account == nil {
+		return false, fmt.Errorf("akun tidak ditemukan")
+	}
+
+	// If no PIN has been set yet, verification passes
+	if account.ParentPIN == "" {
+		return true, nil
+	}
+
+	err = bcrypt.CompareHashAndPassword([]byte(account.ParentPIN), []byte(pin))
+	if err != nil {
+		return false, nil
+	}
+	return true, nil
+}
+
+
 // SetSessionCookie sets the session cookie on the response.
 func SetSessionCookie(w http.ResponseWriter, session *model.Session) {
 	http.SetCookie(w, &http.Cookie{

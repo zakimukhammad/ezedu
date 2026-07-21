@@ -77,6 +77,70 @@ func (h *AuthHandler) Logout(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, http.StatusOK, map[string]string{"message": "Berhasil keluar"})
 }
 
+type setPINRequest struct {
+	PIN string `json:"pin"`
+}
+
+type verifyPINRequest struct {
+	PIN string `json:"pin"`
+}
+
+// UpdatePIN handles PUT /api/auth/pin
+func (h *AuthHandler) UpdatePIN(w http.ResponseWriter, r *http.Request) {
+	accountID := auth.AccountIDFromContext(r.Context())
+	if accountID == 0 {
+		writeJSON(w, http.StatusUnauthorized, map[string]string{"error": "Tidak terautentikasi"})
+		return
+	}
+
+	var req setPINRequest
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		writeJSON(w, http.StatusBadRequest, map[string]string{"error": "Format data tidak valid"})
+		return
+	}
+
+	if err := h.service.SetPIN(accountID, req.PIN); err != nil {
+		writeJSON(w, http.StatusBadRequest, map[string]string{"error": err.Error()})
+		return
+	}
+
+	writeJSON(w, http.StatusOK, map[string]string{"message": "PIN Orang Tua berhasil diperbarui!"})
+}
+
+// VerifyPIN handles POST /api/auth/pin/verify
+func (h *AuthHandler) VerifyPIN(w http.ResponseWriter, r *http.Request) {
+	accountID := auth.AccountIDFromContext(r.Context())
+	if accountID == 0 {
+		writeJSON(w, http.StatusUnauthorized, map[string]string{"error": "Tidak terautentikasi"})
+		return
+	}
+
+	var req verifyPINRequest
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		writeJSON(w, http.StatusBadRequest, map[string]string{"error": "Format data tidak valid"})
+		return
+	}
+
+	valid, err := h.service.VerifyPIN(accountID, req.PIN)
+	if err != nil {
+		writeJSON(w, http.StatusInternalServerError, map[string]string{"error": "Gagal memverifikasi PIN"})
+		return
+	}
+
+	if !valid {
+		writeJSON(w, http.StatusUnauthorized, map[string]interface{}{
+			"valid": false,
+			"error": "PIN Orang Tua salah. Silakan coba lagi.",
+		})
+		return
+	}
+
+	writeJSON(w, http.StatusOK, map[string]interface{}{
+		"valid":   true,
+		"message": "PIN benar",
+	})
+}
+
 // Me handles GET /api/auth/me — returns the current authenticated account.
 func (h *AuthHandler) Me(w http.ResponseWriter, r *http.Request) {
 	accountID := auth.AccountIDFromContext(r.Context())
@@ -85,7 +149,17 @@ func (h *AuthHandler) Me(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	account, err := h.service.GetAccountByID(accountID)
+	if err != nil || account == nil {
+		writeJSON(w, http.StatusUnauthorized, map[string]string{"error": "Akun tidak ditemukan"})
+		return
+	}
+
 	writeJSON(w, http.StatusOK, map[string]interface{}{
-		"account_id": accountID,
+		"account_id":     account.ID,
+		"email":          account.Email,
+		"parent_name":    account.ParentName,
+		"has_parent_pin": account.ParentPIN != "",
 	})
 }
+

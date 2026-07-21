@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'preact/hooks';
-import { categoriesApi, authApi } from '../lib/api';
+import { categoriesApi, authApi, lessonsApi } from '../lib/api';
 
 interface Category {
   id: number;
@@ -43,9 +43,17 @@ const AGE_GROUP_GREETING: Record<string, string> = {
   challengers: 'Tantangan hari ini menantimu! ⚡',
 };
 
+interface NextLesson {
+  id: number;
+  title: string;
+  category_name: string;
+  description: string;
+}
+
 export default function Dashboard() {
   const [child, setChild] = useState<Child | null>(null);
   const [categories, setCategories] = useState<Category[]>([]);
+  const [nextLesson, setNextLesson] = useState<NextLesson | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -55,15 +63,49 @@ export default function Dashboard() {
       window.location.href = '/profil';
       return;
     }
-    setChild(JSON.parse(stored));
-    loadCategories();
+    const childData = JSON.parse(stored);
+    setChild(childData);
+    loadData(childData);
   }, []);
 
-  const loadCategories = async () => {
-    const { data } = await categoriesApi.list();
-    if (data?.categories) {
-      setCategories(data.categories);
+  const loadData = async (childData: Child) => {
+    const { data: catData } = await categoriesApi.list();
+    if (catData?.categories) {
+      setCategories(catData.categories);
     }
+
+    // Try finding next uncompleted lesson in Math or Coding
+    try {
+      const { data: mathData } = await lessonsApi.listByCategory('math', childData.age_group, childData.id);
+      if (mathData?.lessons) {
+        const progMap = mathData.progress || {};
+        const uncompleted = mathData.lessons.find((l: any) => !progMap[l.id] || progMap[l.id].status !== 'completed');
+        if (uncompleted) {
+          setNextLesson({
+            id: uncompleted.id,
+            title: uncompleted.title,
+            category_name: 'Matematika 🧮',
+            description: uncompleted.description,
+          });
+        } else {
+          // If Math is all completed, check Coding
+          const { data: codeData } = await lessonsApi.listByCategory('coding', childData.age_group, childData.id);
+          if (codeData?.lessons) {
+            const codeProgMap = codeData.progress || {};
+            const codeUncompleted = codeData.lessons.find((l: any) => !codeProgMap[l.id] || codeProgMap[l.id].status !== 'completed');
+            if (codeUncompleted) {
+              setNextLesson({
+                id: codeUncompleted.id,
+                title: codeUncompleted.title,
+                category_name: 'Koding & Logika 💻',
+                description: codeUncompleted.description,
+              });
+            }
+          }
+        }
+      }
+    } catch(e) {}
+
     setLoading(false);
   };
 
@@ -97,6 +139,7 @@ export default function Dashboard() {
         <div class="dash-nav-inner">
           <span class="dash-logo">🎓 EzEdu</span>
           <div class="dash-nav-right">
+            <a href="/kemajuan" class="btn-ghost" id="view-progress">📊 Kemajuan</a>
             <button class="btn-ghost" onClick={switchProfile} id="switch-profile">
               Ganti Profil
             </button>
@@ -135,6 +178,22 @@ export default function Dashboard() {
           )}
         </div>
       </section>
+
+      {/* Continue Learning Banner */}
+      {nextLesson && (
+        <section class="dash-continue animate-slide-up" style="max-width: 1200px; margin: var(--space-xl) auto 0; padding: 0 var(--space-lg);">
+          <div class="continue-card" style="background: linear-gradient(135deg, rgba(99, 102, 241, 0.12), rgba(16, 185, 129, 0.12)); border: 2px solid var(--color-primary); border-radius: var(--radius-xl); padding: var(--space-xl); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: var(--space-md);">
+            <div>
+              <span class="badge badge-primary mb-xs">🚀 Lanjutkan Belajar</span>
+              <h2 style="font-size: 1.3rem; margin-top: var(--space-xs); color: var(--color-text);">{nextLesson.title}</h2>
+              <p style="color: var(--color-text-muted); font-size: 0.9rem; margin-top: var(--space-xs);">{nextLesson.category_name} • {nextLesson.description}</p>
+            </div>
+            <a href={`/pelajaran/${nextLesson.id}`} class="btn btn-primary btn-lg" id="continue-lesson-btn">
+              Mulai Belajar Sekarang →
+            </a>
+          </div>
+        </section>
+      )}
 
       {/* Categories Grid */}
       <section class="dash-content">

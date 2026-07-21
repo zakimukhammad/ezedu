@@ -56,6 +56,15 @@ export default function QuizEngine({ lessonId }: Props) {
   const [startTime] = useState(Date.now());
   const [completed, setCompleted] = useState(false);
   const [xpEarned, setXpEarned] = useState(0);
+  const [awardedBadges, setAwardedBadges] = useState<{name: string; description: string; icon: string; slug: string}[]>([]);
+  const [isMuted, setIsMuted] = useState(() => sounds.isMuted());
+  const [leveledUp, setLeveledUp] = useState(false);
+  const [newLevel, setNewLevel] = useState(1);
+
+  const toggleSound = () => {
+    const nextMuted = sounds.toggleMuted();
+    setIsMuted(nextMuted);
+  };
 
   useEffect(() => {
     const stored = sessionStorage.getItem('ezedu_child');
@@ -120,6 +129,19 @@ export default function QuizEngine({ lessonId }: Props) {
     const [moved] = newItems.splice(fromIndex, 1);
     newItems.splice(toIndex, 0, moved);
     setDragItems(newItems);
+    if (submitted && !feedback?.isCorrect) {
+      setSubmitted(false);
+      setFeedback(null);
+    }
+  };
+
+  const selectOption = (opt: string) => {
+    if (submitted && feedback?.isCorrect) return;
+    setSelectedChoice(opt);
+    if (submitted && !feedback?.isCorrect) {
+      setSubmitted(false);
+      setFeedback(null);
+    }
   };
 
   const handleSubmit = async () => {
@@ -190,6 +212,32 @@ export default function QuizEngine({ lessonId }: Props) {
     );
 
     setXpEarned(data?.xp_earned || lesson.xp_reward);
+
+    // Handle badge awards
+    if (data?.badges_awarded && data.badges_awarded.length > 0) {
+      setAwardedBadges(data.badges_awarded);
+    }
+
+    // Refresh child data in sessionStorage (updated XP, level, streak) & check Level-Up
+    try {
+      const stored = sessionStorage.getItem('ezedu_child');
+      if (stored) {
+        const childData = JSON.parse(stored);
+        const oldLevel = childData.current_level || 1;
+        const newXp = (childData.xp_total || 0) + (data?.xp_earned || 0);
+        const calculatedNewLevel = 1 + Math.floor(newXp / 100);
+
+        childData.xp_total = newXp;
+        childData.current_level = calculatedNewLevel;
+        sessionStorage.setItem('ezedu_child', JSON.stringify(childData));
+
+        if (calculatedNewLevel > oldLevel) {
+          setLeveledUp(true);
+          setNewLevel(calculatedNewLevel);
+        }
+      }
+    } catch(e) {}
+
     sounds.playFanfare();
     setCompleted(true);
   };
@@ -220,6 +268,13 @@ export default function QuizEngine({ lessonId }: Props) {
         <h2>Pelajaran Selesai!</h2>
         <p class="summary-subtitle text-muted mt-xs">Kamu sudah menyelesaikan <strong>{lesson.title}</strong></p>
 
+        {/* Level Up Announcement */}
+        {leveledUp && (
+          <div class="level-up-banner mt-lg animate-bounce" style="background: linear-gradient(135deg, #6366f1, #8b5cf6); color: white; padding: var(--space-md); border-radius: var(--radius-lg); font-weight: 800; font-size: 1.1rem; box-shadow: 0 4px 15px rgba(99,102,241,0.4);">
+            🎉 NAIK LEVEL! Kamu sekarang Level {newLevel}! ⭐
+          </div>
+        )}
+
         <div class="summary-stats-grid mt-xl">
           <div class="summary-stat-box">
             <span class="stat-number text-gradient">+{xpEarned} XP</span>
@@ -231,7 +286,28 @@ export default function QuizEngine({ lessonId }: Props) {
           </div>
         </div>
 
-        <div class="mt-2xl flex-center gap-md">
+        {/* Badge Awards */}
+        {awardedBadges.length > 0 && (
+          <div class="badge-award-section mt-xl animate-fade-in">
+            <h3 class="badge-award-title">🏅 Lencana Baru!</h3>
+            <div class="badge-award-list">
+              {awardedBadges.map((badge) => (
+                <div class="badge-award-item" key={badge.slug}>
+                  <span class="badge-award-icon">🏅</span>
+                  <div>
+                    <strong>{badge.name}</strong>
+                    <p class="badge-award-desc">{badge.description}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        <div class="mt-2xl" style="display: flex; gap: var(--space-md); flex-direction: column;">
+          <a href="/kemajuan" class="btn btn-secondary btn-lg w-full" id="finish-to-progress">
+            📊 Lihat Kemajuan
+          </a>
           <a href="/beranda" class="btn btn-primary btn-lg w-full" id="finish-to-dashboard">
             Lanjut Belajar 🚀
           </a>
@@ -251,6 +327,16 @@ export default function QuizEngine({ lessonId }: Props) {
           <div class="quiz-progress-bar" style={`width: ${progressPercent}%`}></div>
         </div>
         <span class="quiz-progress-text">{currentIndex + 1} dari {activities.length} Soal</span>
+        <button
+          type="button"
+          onClick={toggleSound}
+          class="btn-ghost"
+          style="padding: var(--space-xs) var(--space-sm); font-size: 1.2rem; cursor: pointer;"
+          title={isMuted ? 'Aktifkan Suara' : 'Matikan Suara'}
+          id="sound-toggle-btn"
+        >
+          {isMuted ? '🔇' : '🔊'}
+        </button>
       </div>
 
       {/* Main Question Card */}
@@ -275,9 +361,10 @@ export default function QuizEngine({ lessonId }: Props) {
               return (
                 <button
                   key={idx}
+                  type="button"
                   class={`option-card ${isSelected ? 'option-selected' : ''}`}
                   disabled={submitted && feedback?.isCorrect}
-                  onClick={() => !submitted && setSelectedChoice(opt)}
+                  onClick={() => selectOption(opt)}
                 >
                   <span class="option-label">{String.fromCharCode(65 + idx)}</span>
                   <span class="option-text">{opt}</span>
@@ -296,7 +383,13 @@ export default function QuizEngine({ lessonId }: Props) {
               placeholder="Ketik jawabanmu di sini..."
               value={fillAnswer}
               disabled={submitted && feedback?.isCorrect}
-              onInput={(e) => setFillAnswer((e.target as HTMLInputElement).value)}
+              onInput={(e) => {
+                setFillAnswer((e.target as HTMLInputElement).value);
+                if (submitted && !feedback?.isCorrect) {
+                  setSubmitted(false);
+                  setFeedback(null);
+                }
+              }}
               onKeyPress={(e) => e.key === 'Enter' && handleSubmit()}
               autoFocus
             />
@@ -307,7 +400,13 @@ export default function QuizEngine({ lessonId }: Props) {
         {currentActivity.type === 'block_code' && (
           <BlockCodingEngine
             availableBlocks={currentQuestion?.available_blocks || []}
-            onChange={setBlockAnswer}
+            onChange={(blocks) => {
+              setBlockAnswer(blocks);
+              if (submitted && !feedback?.isCorrect) {
+                setSubmitted(false);
+                setFeedback(null);
+              }
+            }}
             disabled={submitted && feedback?.isCorrect}
           />
         )}
@@ -355,7 +454,7 @@ export default function QuizEngine({ lessonId }: Props) {
               <strong class="feedback-title">{feedback.text}</strong>
             </div>
 
-            {feedback.explanation && (
+            {feedback.isCorrect && feedback.explanation && (
               <p class="feedback-explanation mt-xs">{feedback.explanation}</p>
             )}
 
@@ -387,7 +486,7 @@ export default function QuizEngine({ lessonId }: Props) {
               onClick={handleSubmit}
               id="quiz-submit-btn"
             >
-              {submitting ? 'Memeriksa...' : 'Jawab Now 🚀'}
+              {submitting ? 'Memeriksa...' : (attemptCount > 1 ? 'Coba Lagi 🚀' : 'Jawab Now 🚀')}
             </button>
           ) : (
             <button

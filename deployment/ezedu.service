@@ -1,0 +1,20 @@
+[Unit]
+Description=EzEdu Backend API Service
+After=network.target
+
+[Service]
+Type=simple
+User=ezedu
+WorkingDirectory=/opt/ezedu
+ExecStart=/opt/ezedu/server
+Restart=always
+RestartSec=5
+Environment=EZEDU_PORT=8080
+Environment=EZEDU_DATA_DIR=/opt/ezedu/data
+
+# Resource limits (optimized for 1GB VPS)
+MemoryMax=128M
+CPUQuota=80%
+
+[Install]
+WantedBy=multi-user.target

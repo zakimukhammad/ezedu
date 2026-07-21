@@ -53,6 +53,18 @@ export const authApi = {
 
   me: () =>
     request('/auth/me'),
+
+  updatePin: (pin: string) =>
+    request('/auth/pin', {
+      method: 'PUT',
+      body: JSON.stringify({ pin }),
+    }),
+
+  verifyPin: (pin: string) =>
+    request('/auth/pin/verify', {
+      method: 'POST',
+      body: JSON.stringify({ pin }),
+    }),
 };
 
 // Children API
@@ -116,5 +128,17 @@ export const activitiesApi = {
         attempt_no: attemptNo,
       }),
     }),
+};
+
+// Progress API
+export const progressApi = {
+  getChildProgress: (childId: number) =>
+    request(`/children/${childId}/progress`),
+};
+
+// Badges API
+export const badgesApi = {
+  getChildBadges: (childId: number) =>
+    request(`/children/${childId}/badges`),
 };
 

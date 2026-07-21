@@ -17,6 +17,7 @@ type LessonHandler struct {
 	categories *store.CategoryStore
 	progress   *store.ProgressStore
 	children   *store.ChildStore
+	badges     *store.BadgeStore
 }
 
 func NewLessonHandler(
@@ -24,12 +25,14 @@ func NewLessonHandler(
 	categories *store.CategoryStore,
 	progress *store.ProgressStore,
 	children *store.ChildStore,
+	badges *store.BadgeStore,
 ) *LessonHandler {
 	return &LessonHandler{
 		lessons:    lessons,
 		categories: categories,
 		progress:   progress,
 		children:   children,
+		badges:     badges,
 	}
 }
 
@@ -253,9 +256,80 @@ func (h *LessonHandler) CompleteLesson(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Update streak
+	_ = h.progress.UpdateStreak(req.ChildID)
+
+	// Evaluate and award badges
+	var awardedBadges []map[string]interface{}
+	if h.badges != nil {
+		newBadges, _ := h.badges.EvaluateAndAwardBadges(req.ChildID)
+		for _, b := range newBadges {
+			awardedBadges = append(awardedBadges, map[string]interface{}{
+				"name":        b.Name,
+				"description": b.Description,
+				"icon":        b.Icon,
+				"slug":        b.Slug,
+			})
+		}
+	}
+
 	writeJSON(w, http.StatusOK, map[string]interface{}{
-		"message":   "Selamat! Kamu berhasil menyelesaikan pelajaran 🎉",
-		"xp_earned": xpReward,
+		"message":        "Selamat! Kamu berhasil menyelesaikan pelajaran 🎉",
+		"xp_earned":      xpReward,
+		"badges_awarded": awardedBadges,
+	})
+}
+
+// GetChildProgress handles GET /api/children/{id}/progress
+func (h *LessonHandler) GetChildProgress(w http.ResponseWriter, r *http.Request) {
+	accountID := auth.AccountIDFromContext(r.Context())
+	childID, err := strconv.ParseInt(chi.URLParam(r, "id"), 10, 64)
+	if err != nil {
+		writeJSON(w, http.StatusBadRequest, map[string]string{"error": "ID tidak valid"})
+		return
+	}
+
+	child, err := h.children.GetByID(childID, accountID)
+	if err != nil || child == nil {
+		writeJSON(w, http.StatusNotFound, map[string]string{"error": "Profil anak tidak ditemukan"})
+		return
+	}
+
+	summary, err := h.progress.GetChildProgressSummary(childID, child.AgeGroup)
+	if err != nil {
+		writeJSON(w, http.StatusInternalServerError, map[string]string{"error": "Gagal memuat data kemajuan"})
+		return
+	}
+
+	writeJSON(w, http.StatusOK, map[string]interface{}{
+		"child":    child,
+		"progress": summary,
+	})
+}
+
+// GetChildBadges handles GET /api/children/{id}/badges
+func (h *LessonHandler) GetChildBadges(w http.ResponseWriter, r *http.Request) {
+	accountID := auth.AccountIDFromContext(r.Context())
+	childID, err := strconv.ParseInt(chi.URLParam(r, "id"), 10, 64)
+	if err != nil {
+		writeJSON(w, http.StatusBadRequest, map[string]string{"error": "ID tidak valid"})
+		return
+	}
+
+	child, err := h.children.GetByID(childID, accountID)
+	if err != nil || child == nil {
+		writeJSON(w, http.StatusNotFound, map[string]string{"error": "Profil anak tidak ditemukan"})
+		return
+	}
+
+	badges, err := h.badges.ListChildBadges(childID)
+	if err != nil {
+		writeJSON(w, http.StatusInternalServerError, map[string]string{"error": "Gagal memuat data lencana"})
+		return
+	}
+
+	writeJSON(w, http.StatusOK, map[string]interface{}{
+		"badges": badges,
 	})
 }
 

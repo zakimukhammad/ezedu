@@ -56,6 +56,7 @@ func main() {
 	categoryStore := store.NewCategoryStore(db)
 	lessonStore := store.NewLessonStore(db)
 	progressStore := store.NewProgressStore(db)
+	badgeStore := store.NewBadgeStore(db)
 
 	// Initialize auth service
 	authService := auth.NewService(accountStore, sessionStore)
@@ -64,7 +65,7 @@ func main() {
 	authHandler := handler.NewAuthHandler(authService)
 	childHandler := handler.NewChildHandler(childStore)
 	categoryHandler := handler.NewCategoryHandler(categoryStore)
-	lessonHandler := handler.NewLessonHandler(lessonStore, categoryStore, progressStore, childStore)
+	lessonHandler := handler.NewLessonHandler(lessonStore, categoryStore, progressStore, childStore, badgeStore)
 
 	// Build router
 	r := chi.NewRouter()
@@ -88,6 +89,8 @@ func main() {
 
 			r.Post("/auth/logout", authHandler.Logout)
 			r.Get("/auth/me", authHandler.Me)
+			r.Put("/auth/pin", authHandler.UpdatePIN)
+			r.Post("/auth/pin/verify", authHandler.VerifyPIN)
 
 			// Child profiles
 			r.Get("/children", childHandler.List)
@@ -103,6 +106,10 @@ func main() {
 			r.Get("/lessons/{id}", lessonHandler.GetByID)
 			r.Post("/activities/{id}/submit", lessonHandler.SubmitActivity)
 			r.Post("/lessons/{id}/complete", lessonHandler.CompleteLesson)
+
+			// Progress & Badges
+			r.Get("/children/{id}/progress", lessonHandler.GetChildProgress)
+			r.Get("/children/{id}/badges", lessonHandler.GetChildBadges)
 		})
 	})
 

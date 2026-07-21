@@ -731,6 +731,88 @@ func SeedCurriculum(db *sql.DB) error {
 		)
 	}
 
+	// ==========================================
+	// MINI-GAME LESSONS (CROSS-CATEGORY)
+	// ==========================================
+
+	// Lesson 39: Math Racer (Math category, timed mini-game)
+	_, _ = db.Exec(
+		`INSERT OR IGNORE INTO lessons (id, category_id, age_group, level, sort_order, title, description, content_json, estimated_minutes, xp_reward)
+		 VALUES (39, ?, 'builders', 4, 1, 'Math Racer ⏱️', 'Pecahkan soal aritmatika sebanyak mungkin dalam 60 detik!', 
+		 '{"intro_text":"Seberapa cepat kamu bisa menghitung? Ayo buktikan!","icon":"⏱️","game_type":"math_racer"}', 5, 30)`,
+		mathCatID,
+	)
+	_, _ = db.Exec(
+		`INSERT OR IGNORE INTO activities (id, lesson_id, type, sort_order, question_json, max_score)
+		 VALUES (39, 39, 'timed', 1, ?, 100)`,
+		`{
+			"prompt": "Pecahkan soal aritmatika sebanyak mungkin dalam 60 detik! ⏱️🚀",
+			"time_limit": 60,
+			"operations": ["add", "subtract"],
+			"max_number": 50,
+			"game_type": "math_racer"
+		}`,
+	)
+
+	// Lesson 40: Susun Kata (Language category, word builder mini-game)
+	_ = db.QueryRow(`SELECT id FROM categories WHERE slug = 'language'`).Scan(&langCatID)
+	if langCatID > 0 {
+		_, _ = db.Exec(
+			`INSERT OR IGNORE INTO lessons (id, category_id, age_group, level, sort_order, title, description, content_json, estimated_minutes, xp_reward)
+			 VALUES (40, ?, 'builders', 4, 1, 'Susun Kata 📝', 'Susun huruf-huruf acak menjadi kata yang benar', 
+			 '{"intro_text":"Dapatkah kamu menyusun huruf acak menjadi kata yang benar? Ayo coba!","icon":"📝","game_type":"word_builder"}', 10, 25)`,
+			langCatID,
+		)
+		_, _ = db.Exec(
+			`INSERT OR IGNORE INTO activities (id, lesson_id, type, sort_order, question_json, max_score)
+			 VALUES (40, 40, 'fill_blank', 1, ?, 50)`,
+			`{
+				"prompt": "Susun huruf acak menjadi kata yang benar! 📝",
+				"game_type": "word_builder",
+				"words": [
+					{"word": "KUCING", "clue": "🐱 Hewan berkaki empat yang suka ikan"},
+					{"word": "BUNGA", "clue": "🌸 Tumbuhan indah yang harum"},
+					{"word": "MATAHARI", "clue": "☀️ Benda langit yang bersinar terang di siang hari"},
+					{"word": "SEKOLAH", "clue": "🏫 Tempat untuk belajar bersama teman-teman"},
+					{"word": "PELANGI", "clue": "🌈 Lengkungan warna-warni di langit setelah hujan"}
+				]
+			}`,
+		)
+	}
+
+	// Lesson 41: Labirin Logika (Logic category, maze mini-game)
+	_ = db.QueryRow(`SELECT id FROM categories WHERE slug = 'logic'`).Scan(&logicCatID)
+	if logicCatID > 0 {
+		_, _ = db.Exec(
+			`INSERT OR IGNORE INTO lessons (id, category_id, age_group, level, sort_order, title, description, content_json, estimated_minutes, xp_reward)
+			 VALUES (41, ?, 'builders', 4, 1, 'Labirin Logika 🧩', 'Arahkan karakter melewati labirin menuju bintang!', 
+			 '{"intro_text":"Gunakan perintah arah untuk memandu kucing melewati labirin!","icon":"🧩","game_type":"maze_logic"}', 10, 25)`,
+			logicCatID,
+		)
+		const maze41JSON = `{
+			"prompt": "Arahkan 🐱 melewati labirin menuju ⭐! Gunakan tombol arah.",
+			"game_type": "maze_logic",
+			"maze_data": {
+				"width": 6,
+				"height": 6,
+				"start": [0, 0],
+				"goal": [5, 5],
+				"walls": [
+					[0,1],[1,1],[2,1],[3,1],[4,1],
+					[1,3],[2,3],[3,3],[4,3],[5,3],
+					[0,5],[1,5],[2,5],[3,5],[4,5]
+				]
+			},
+			"hint": "Ikuti jalan berliku: Ke Kanan (➡️), Turun (⬇️), Ke Kiri (⬅️), Turun (⬇️), Ke Kanan (➡️)!"
+		}`
+		_, _ = db.Exec(
+			`INSERT OR IGNORE INTO activities (id, lesson_id, type, sort_order, question_json, max_score)
+			 VALUES (41, 41, 'sequencing', 1, ?, 10)`,
+			maze41JSON,
+		)
+		_, _ = db.Exec(`UPDATE activities SET question_json = ? WHERE id = 41`, maze41JSON)
+	}
+
 	fmt.Println("Seeded Math, Coding, Toddler, Science, Language, Logic, and Art curriculum content")
 	return nil
 }

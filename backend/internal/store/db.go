@@ -141,6 +141,25 @@ func Migrate(db *sql.DB) error {
 			ip_address TEXT DEFAULT ''
 		)`,
 
+		`CREATE TABLE IF NOT EXISTS daily_challenges (
+			id INTEGER PRIMARY KEY AUTOINCREMENT,
+			challenge_date DATE NOT NULL,
+			age_group TEXT NOT NULL CHECK(age_group IN ('toddlers', 'explorers', 'builders', 'challengers')),
+			activity_type TEXT NOT NULL,
+			question_json TEXT NOT NULL DEFAULT '{}',
+			max_score INTEGER DEFAULT 10,
+			UNIQUE(challenge_date, age_group)
+		)`,
+
+		`CREATE TABLE IF NOT EXISTS daily_challenge_results (
+			id INTEGER PRIMARY KEY AUTOINCREMENT,
+			child_id INTEGER NOT NULL REFERENCES children(id) ON DELETE CASCADE,
+			challenge_id INTEGER NOT NULL REFERENCES daily_challenges(id),
+			score INTEGER DEFAULT 0,
+			completed_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+			UNIQUE(child_id, challenge_id)
+		)`,
+
 		// Indexes
 		`CREATE INDEX IF NOT EXISTS idx_children_account ON children(account_id)`,
 		`CREATE INDEX IF NOT EXISTS idx_lessons_category_age ON lessons(category_id, age_group, level)`,

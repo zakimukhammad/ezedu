@@ -190,6 +190,18 @@ func (h *LessonHandler) SubmitActivity(w http.ResponseWriter, r *http.Request) {
 	case "drawing", "pixel_art":
 		isCorrect = true
 		score = activity.MaxScore
+
+	case "timed":
+		// Timed activities (e.g., Math Racer) send their score from the client
+		var clientScore int
+		_ = json.Unmarshal(req.Answer, &clientScore)
+		if clientScore > 0 {
+			isCorrect = true
+			score = clientScore
+			if score > activity.MaxScore {
+				score = activity.MaxScore
+			}
+		}
 	}
 
 	if req.AttemptNo == 0 {

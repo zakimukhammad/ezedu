@@ -126,3 +126,22 @@ func AgeGroupFromBirthYear(birthYear, currentYear int) string {
 		return "challengers"
 	}
 }
+
+// DailyChallenge represents a daily challenge for an age group.
+type DailyChallenge struct {
+	ID            int64  `json:"id"`
+	ChallengeDate string `json:"challenge_date"`
+	AgeGroup      string `json:"age_group"`
+	ActivityType  string `json:"activity_type"`
+	QuestionJSON  string `json:"question_json"`
+	MaxScore      int    `json:"max_score"`
+}
+
+// DailyChallengeResult records a child's result for a daily challenge.
+type DailyChallengeResult struct {
+	ID          int64  `json:"id"`
+	ChildID     int64  `json:"child_id"`
+	ChallengeID int64  `json:"challenge_id"`
+	Score       int    `json:"score"`
+	CompletedAt string `json:"completed_at"`
+}

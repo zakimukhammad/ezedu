@@ -57,6 +57,7 @@ func main() {
 	lessonStore := store.NewLessonStore(db)
 	progressStore := store.NewProgressStore(db)
 	badgeStore := store.NewBadgeStore(db)
+	dailyStore := store.NewDailyStore(db)
 
 	// Initialize auth service
 	authService := auth.NewService(accountStore, sessionStore)
@@ -66,6 +67,7 @@ func main() {
 	childHandler := handler.NewChildHandler(childStore)
 	categoryHandler := handler.NewCategoryHandler(categoryStore)
 	lessonHandler := handler.NewLessonHandler(lessonStore, categoryStore, progressStore, childStore, badgeStore)
+	dailyHandler := handler.NewDailyHandler(dailyStore)
 
 	// Build router
 	r := chi.NewRouter()
@@ -110,6 +112,11 @@ func main() {
 			// Progress & Badges
 			r.Get("/children/{id}/progress", lessonHandler.GetChildProgress)
 			r.Get("/children/{id}/badges", lessonHandler.GetChildBadges)
+
+			// Daily Challenges
+			r.Get("/daily-challenge", dailyHandler.GetToday)
+			r.Post("/daily-challenge/submit", dailyHandler.Submit)
+			r.Get("/daily-challenge/streak", dailyHandler.GetStreak)
 		})
 	})
 

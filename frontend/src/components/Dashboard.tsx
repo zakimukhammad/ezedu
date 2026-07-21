@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'preact/hooks';
-import { categoriesApi, authApi, lessonsApi } from '../lib/api';
+import { categoriesApi, authApi, lessonsApi, dailyChallengeApi } from '../lib/api';
 
 interface Category {
   id: number;
@@ -57,6 +57,9 @@ export default function Dashboard() {
   const [child, setChild] = useState<Child | null>(null);
   const [categories, setCategories] = useState<Category[]>([]);
   const [nextLesson, setNextLesson] = useState<NextLesson | null>(null);
+  const [dailyChallenge, setDailyChallenge] = useState<any>(null);
+  const [dailyCompleted, setDailyCompleted] = useState(false);
+  const [dailyStreak, setDailyStreak] = useState(0);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -82,6 +85,19 @@ export default function Dashboard() {
       });
       setCategories(filtered);
     }
+
+    // Load Daily Challenge
+    try {
+      const { data: dailyData } = await dailyChallengeApi.getToday(childData.age_group, childData.id);
+      if (dailyData?.challenge) {
+        setDailyChallenge(dailyData.challenge);
+        setDailyCompleted(!!dailyData.completed);
+      }
+      const { data: streakData } = await dailyChallengeApi.getStreak(childData.id);
+      if (streakData?.streak !== undefined) {
+        setDailyStreak(streakData.streak);
+      }
+    } catch (e) {}
 
     // Try finding next uncompleted lesson in the appropriate age group category
     try {
@@ -173,6 +189,40 @@ export default function Dashboard() {
           )}
         </div>
       </section>
+
+      {/* Daily Challenge Card */}
+      {dailyChallenge && (
+        <section class="dash-daily animate-slide-up" style="max-width: 1200px; margin: var(--space-xl) auto 0; padding: 0 var(--space-lg);">
+          <div class="daily-challenge-card">
+            <div class="daily-challenge-header">
+              <span class="daily-challenge-icon">🎯</span>
+              <span class="daily-challenge-title">Tantangan Harian</span>
+              {dailyStreak > 0 && (
+                <span class="daily-challenge-streak">🔥 {dailyStreak} Hari Streak</span>
+              )}
+            </div>
+            <div class="daily-challenge-body">
+              <p class="daily-challenge-preview">
+                {JSON.parse(dailyChallenge.question_json || '{}').prompt || 'Tantangan harian siap dimainkan!'}
+              </p>
+              {dailyCompleted ? (
+                <div class="daily-challenge-completed">
+                  <span>✅ Kamu sudah menyelesaikan tantangan hari ini! Sampai jumpa besok! 🎉</span>
+                </div>
+              ) : (
+                <a
+                  href={`/pelajaran/39`}
+                  class="btn btn-primary mt-sm"
+                  style="display: inline-block;"
+                  id="start-daily-challenge-btn"
+                >
+                  Mainkan Tantangan Harian 🚀
+                </a>
+              )}
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* Continue Learning Banner */}
       {nextLesson && (

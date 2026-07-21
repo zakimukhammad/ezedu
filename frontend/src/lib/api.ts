@@ -142,3 +142,26 @@ export const badgesApi = {
     request(`/children/${childId}/badges`),
 };
 
+// Daily Challenge API
+export const dailyChallengeApi = {
+  getToday: (ageGroup: string, childId?: number) => {
+    let url = `/daily-challenge?age_group=${ageGroup}`;
+    if (childId) url += `&child_id=${childId}`;
+    return request(url);
+  },
+
+  submit: (childId: number, challengeId: number, answer: any, score: number) =>
+    request('/daily-challenge/submit', {
+      method: 'POST',
+      body: JSON.stringify({
+        child_id: childId,
+        challenge_id: challengeId,
+        answer,
+        score,
+      }),
+    }),
+
+  getStreak: (childId: number) =>
+    request(`/daily-challenge/streak?child_id=${childId}`),
+};
+

@@ -5,6 +5,9 @@ import BlockCodingEngine from './BlockCodingEngine';
 import ToddlerEngine from './ToddlerEngine';
 import CanvasDrawingEngine from './CanvasDrawingEngine';
 import PixelArtEngine from './PixelArtEngine';
+import MathRacerEngine from './MathRacerEngine';
+import WordBuilderEngine from './WordBuilderEngine';
+import MazeLogicEngine from './MazeLogicEngine';
 
 interface Activity {
   id: number;
@@ -399,7 +402,13 @@ export default function QuizEngine({ lessonId }: Props) {
       {/* Main Question Card */}
       <div class={`quiz-card card mt-lg animate-fade-in ${feedback && !feedback.isCorrect ? 'shake-card' : ''}`}>
         <div class="quiz-type-badge">
-          {currentActivity.type === 'multiple_choice'
+          {currentQuestion?.game_type === 'math_racer' || currentActivity.type === 'timed'
+            ? '⏱️ Math Racer'
+            : currentQuestion?.game_type === 'word_builder'
+            ? '📝 Susun Kata'
+            : currentQuestion?.game_type === 'maze_logic'
+            ? '🧩 Labirin Logika'
+            : currentActivity.type === 'multiple_choice'
             ? '💡 Pilihan Ganda'
             : currentActivity.type === 'fill_blank'
             ? '✏️ Ketik Jawaban'
@@ -412,7 +421,9 @@ export default function QuizEngine({ lessonId }: Props) {
             : '🧩 Seret & Urutkan'}
         </div>
 
-        <h2 class="quiz-prompt mt-md">{currentQuestion?.prompt}</h2>
+        {!['math_racer', 'word_builder', 'maze_logic'].includes(currentQuestion?.game_type) && currentActivity.type !== 'timed' && (
+          <h2 class="quiz-prompt mt-md">{currentQuestion?.prompt}</h2>
+        )}
 
         {/* Multiple Choice Component */}
         {currentActivity.type === 'multiple_choice' && (
@@ -435,8 +446,8 @@ export default function QuizEngine({ lessonId }: Props) {
           </div>
         )}
 
-        {/* Fill in the Blank Component */}
-        {currentActivity.type === 'fill_blank' && (
+        {/* Fill in the Blank Component (Standard) */}
+        {currentActivity.type === 'fill_blank' && currentQuestion?.game_type !== 'word_builder' && (
           <div class="fill-blank-container mt-xl">
             <input
               type="text"
@@ -472,8 +483,8 @@ export default function QuizEngine({ lessonId }: Props) {
           />
         )}
 
-        {/* Drag & Drop / Sequencing Component */}
-        {(currentActivity.type === 'drag_drop' || currentActivity.type === 'sequencing') && (
+        {/* Drag & Drop / Sequencing Component (Standard) */}
+        {(currentActivity.type === 'drag_drop' || (currentActivity.type === 'sequencing' && currentQuestion?.game_type !== 'maze_logic')) && (
           <div class="reorder-container mt-xl">
             <p class="reorder-instruction text-muted">
               Gunakan tombol panah ⬆️ ⬇️ untuk mengurutkan item dari atas ke bawah:
@@ -523,6 +534,30 @@ export default function QuizEngine({ lessonId }: Props) {
           />
         )}
 
+        {/* Math Racer Mini-Game */}
+        {(currentActivity.type === 'timed' || currentQuestion?.game_type === 'math_racer') && (
+          <MathRacerEngine
+            activity={currentActivity}
+            onComplete={(score) => handleCreativeComplete(score)}
+          />
+        )}
+
+        {/* Word Builder Mini-Game */}
+        {currentQuestion?.game_type === 'word_builder' && (
+          <WordBuilderEngine
+            activity={currentActivity}
+            onComplete={(score) => handleCreativeComplete(score)}
+          />
+        )}
+
+        {/* Maze Logic Mini-Game */}
+        {currentQuestion?.game_type === 'maze_logic' && (
+          <MazeLogicEngine
+            activity={currentActivity}
+            onComplete={(score) => handleCreativeComplete(score)}
+          />
+        )}
+
         {/* Instant Feedback Panel */}
         {feedback && (
           <div class={`feedback-panel mt-xl ${feedback.isCorrect ? 'feedback-success' : 'feedback-wrong'} animate-slide-up`}>
@@ -550,7 +585,7 @@ export default function QuizEngine({ lessonId }: Props) {
         )}
 
         {/* Submit & Navigation Buttons */}
-        {currentActivity.type !== 'drawing' && currentActivity.type !== 'pixel_art' && (
+        {currentActivity.type !== 'drawing' && currentActivity.type !== 'pixel_art' && currentActivity.type !== 'timed' && !['math_racer', 'word_builder', 'maze_logic'].includes(currentQuestion?.game_type) && (
           <div class="quiz-footer mt-xl">
             {!submitted || (feedback && !feedback.isCorrect) ? (
               <button

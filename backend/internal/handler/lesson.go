@@ -160,14 +160,20 @@ func (h *LessonHandler) SubmitActivity(w http.ResponseWriter, r *http.Request) {
 			score = activity.MaxScore
 		}
 
-	case "drag_drop", "sequencing":
+	case "drag_drop", "sequencing", "block_code":
 		var userOrder []string
 		_ = json.Unmarshal(req.Answer, &userOrder)
 
 		if len(userOrder) == len(qData.ExpectedOrder) {
 			match := true
 			for i, v := range qData.ExpectedOrder {
-				if i >= len(userOrder) || !strings.EqualFold(strings.TrimSpace(userOrder[i]), strings.TrimSpace(v)) {
+				if i >= len(userOrder) {
+					match = false
+					break
+				}
+				u := normalizeString(userOrder[i])
+				exp := normalizeString(v)
+				if u != exp && !strings.Contains(u, exp) && !strings.Contains(exp, u) {
 					match = false
 					break
 				}
@@ -252,3 +258,15 @@ func (h *LessonHandler) CompleteLesson(w http.ResponseWriter, r *http.Request) {
 		"xp_earned": xpReward,
 	})
 }
+
+func normalizeString(s string) string {
+	s = strings.ToLower(s)
+	var sb strings.Builder
+	for _, r := range s {
+		if (r >= 'a' && r <= 'z') || (r >= '0' && r <= '9') || r == ' ' {
+			sb.WriteRune(r)
+		}
+	}
+	return strings.TrimSpace(sb.String())
+}
+

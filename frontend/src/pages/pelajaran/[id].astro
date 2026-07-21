@@ -12,6 +12,10 @@ export function getStaticPaths() {
     { params: { id: '6' } },
     { params: { id: '7' } },
     { params: { id: '8' } },
+    { params: { id: '9' } },
+    { params: { id: '10' } },
+    { params: { id: '11' } },
+    { params: { id: '12' } },
   ];
 }
 
@@ -177,6 +181,124 @@ const lessonIdNum = parseInt(id, 10);
     width: 100%;
     max-width: 400px;
     border-color: var(--color-primary-light);
+  }
+
+  /* Block Coding Component Styles */
+  .palette-title {
+    font-size: 0.85rem;
+    font-weight: 600;
+  }
+
+  .palette-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-sm);
+  }
+
+  .block-btn {
+    background: var(--color-bg-elevated);
+    border: 1px solid var(--color-primary);
+    color: var(--color-primary-light);
+    font-family: var(--font-body);
+    font-weight: 600;
+    font-size: 0.9rem;
+    padding: var(--space-xs) var(--space-md);
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+  }
+
+  .block-btn:hover:not(:disabled) {
+    background: var(--color-primary);
+    color: white;
+    transform: translateY(-2px);
+  }
+
+  .block-canvas {
+    background: var(--color-bg);
+    padding: var(--space-lg);
+  }
+
+  .canvas-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .canvas-title {
+    font-weight: 700;
+    font-size: 0.95rem;
+  }
+
+  .btn-clear-canvas {
+    background: none;
+    border: none;
+    color: var(--color-danger-light);
+    font-size: 0.85rem;
+    cursor: pointer;
+    font-weight: 600;
+  }
+
+  .empty-canvas {
+    padding: var(--space-xl);
+    border: 2px dashed var(--color-border);
+    border-radius: var(--radius-md);
+    margin-top: var(--space-md);
+  }
+
+  .assembled-blocks-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xs);
+  }
+
+  .assembled-block-item {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    background: var(--color-bg-card);
+    border: 1px solid var(--color-border);
+    padding: var(--space-xs) var(--space-md);
+    border-radius: var(--radius-md);
+  }
+
+  .block-number {
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: var(--color-text-muted);
+  }
+
+  .block-badge {
+    flex: 1;
+    font-weight: 600;
+    font-size: 0.95rem;
+    color: var(--color-primary-light);
+  }
+
+  .block-actions {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .btn-block-action {
+    background: var(--color-bg-elevated);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    padding: 2px 6px;
+    cursor: pointer;
+    font-size: 0.8rem;
+  }
+
+  .btn-block-delete {
+    background: rgba(239, 68, 68, 0.15);
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    color: var(--color-danger);
+    border-radius: var(--radius-sm);
+    padding: 2px 8px;
+    cursor: pointer;
+    font-weight: 700;
+    font-size: 0.8rem;
   }
 
   /* Reorder List (Drag & Drop) */

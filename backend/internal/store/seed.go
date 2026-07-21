@@ -200,13 +200,13 @@ func SeedCurriculum(db *sql.DB) error {
 	)
 
 	// ==========================================
-	// CODING LESSONS (BUILDERS AGE GROUP: L1 - L2)
+	// CODING LESSONS (BUILDERS AGE GROUP: L1 - L3)
 	// ==========================================
 
-	// 7. Coding Lesson 1 (Level 1)
+	// 7. Coding Level 1 Lesson 1: Algoritma & Urutan Langkah
 	_, _ = db.Exec(
 		`INSERT OR IGNORE INTO lessons (id, category_id, age_group, level, sort_order, title, description, content_json, estimated_minutes, xp_reward)
-		 VALUES (3, ?, 'builders', 1, 1, 'Algoritma & urutan Langkah', 'Belajar menyusun instruksi komputer dengan urutan yang tepat', 
+		 VALUES (3, ?, 'builders', 1, 1, 'Algoritma & Urutan Langkah', 'Belajar menyusun instruksi komputer dengan urutan yang tepat', 
 		 '{"intro_text":"Komputer itu sangat patuh tapi butuh petunjuk yang jelas! Urutan langkah petunjuk ini disebut Algoritma.","icon":"🤖"}', 10, 20)`,
 		codingCatID,
 	)
@@ -235,7 +235,27 @@ func SeedCurriculum(db *sql.DB) error {
 		}`,
 	)
 
-	// 8. Coding Lesson 2 (Level 2)
+	// 8. Coding Level 1 Lesson 2: Navigasi Arah Robot (Block Coding)
+	_, _ = db.Exec(
+		`INSERT OR IGNORE INTO lessons (id, category_id, age_group, level, sort_order, title, description, content_json, estimated_minutes, xp_reward)
+		 VALUES (9, ?, 'builders', 1, 2, 'Navigasi Arah Robot', 'Menyusun blok kode arah untuk menggerakkan robot ke bendera', 
+		 '{"intro_text":"Robot berada di posisi start. Susun blok kode arah untuk mengantarkan robot ke garis finish!","icon":"🧩"}', 10, 20)`,
+		codingCatID,
+	)
+
+	_, _ = db.Exec(
+		`INSERT OR IGNORE INTO activities (id, lesson_id, type, sort_order, question_json, max_score)
+		 VALUES (15, 9, 'block_code', 1, ?, 10)`,
+		`{
+			"prompt": "Susun blok kode agar robot berjalan: Maju 1 langkah, Belok Kanan, lalu Maju 1 langkah!",
+			"available_blocks": ["Maju ⬆️", "Belok Kiri ⬅️", "Belok Kanan ➡️", "Ulangi 3x 🔄"],
+			"expected_order": ["Maju ⬆️", "Belok Kanan ➡️", "Maju ⬆️"],
+			"hint": "Robot butuh maju, belok kanan, lalu maju lagi!",
+			"explanation": "Urutan blok kode yang benar: Maju ⬆️ -> Belok Kanan ➡️ -> Maju ⬆️."
+		}`,
+	)
+
+	// 9. Coding Level 2 Lesson 1: Pengulangan (Looping)
 	_, _ = db.Exec(
 		`INSERT OR IGNORE INTO lessons (id, category_id, age_group, level, sort_order, title, description, content_json, estimated_minutes, xp_reward)
 		 VALUES (4, ?, 'builders', 2, 1, 'Pengulangan (Looping)', 'Belajar menggunakan perintah perulangan agar kode lebih hemat', 
@@ -255,6 +275,90 @@ func SeedCurriculum(db *sql.DB) error {
 		}`,
 	)
 
-	fmt.Println("Seeded Math (L1-L3) & Coding curriculum content for Builders group")
+	// 10. Coding Level 2 Lesson 2: Menghemat Kode dengan Loop (Block Coding)
+	_, _ = db.Exec(
+		`INSERT OR IGNORE INTO lessons (id, category_id, age_group, level, sort_order, title, description, content_json, estimated_minutes, xp_reward)
+		 VALUES (10, ?, 'builders', 2, 2, 'Menghemat Kode dengan Loop', 'Gunakan blok Ulangi 3x untuk memutar pola berjalan', 
+		 '{"intro_text":"Loop menghemat jumlah baris kode yang kamu tulis!","icon":"⚡"}', 12, 25)`,
+		codingCatID,
+	)
+
+	_, _ = db.Exec(
+		`INSERT OR IGNORE INTO activities (id, lesson_id, type, sort_order, question_json, max_score)
+		 VALUES (16, 10, 'block_code', 1, ?, 10)`,
+		`{
+			"prompt": "Susun blok kode ringkas menggunakan Ulangi 3x diikuti Maju 1 langkah!",
+			"available_blocks": ["Maju ⬆️", "Belok Kiri ⬅️", "Ulangi 3x 🔄", "Tutup Loop 🔚"],
+			"expected_order": ["Ulangi 3x 🔄", "Maju ⬆️"],
+			"hint": "Gunakan blok Ulangi 3x 🔄 terlebih dahulu!",
+			"explanation": "Blok perulangan menginstruksikan robot untuk mengulang perintah Maju sebanyak 3 kali."
+		}`,
+	)
+
+	// 11. Coding Level 3 Lesson 1: Kondisi & Pengandaian (Jika - Maka)
+	_, _ = db.Exec(
+		`INSERT OR IGNORE INTO lessons (id, category_id, age_group, level, sort_order, title, description, content_json, estimated_minutes, xp_reward)
+		 VALUES (11, ?, 'builders', 3, 1, 'Kondisi & Pengandaian (If - Else)', 'Belajar membuat keputusan otomatis berdasarkan kondisi', 
+		 '{"intro_text":"Komputer bisa mengambil keputusan! Jika ada rintangan di depan, maka robot harus berbelok.","icon":"🔀"}', 15, 30)`,
+		codingCatID,
+	)
+
+	_, _ = db.Exec(
+		`INSERT OR IGNORE INTO activities (id, lesson_id, type, sort_order, question_json, max_score)
+		 VALUES (17, 11, 'multiple_choice', 1, ?, 10)`,
+		`{
+			"prompt": "Manakah contoh aturan logika 'Jika - Maka' (If - Then) dalam kehidupan sehari-hari?",
+			"options": ["Jika hujan, maka pakailah payung", "Lari tanpa melihat jalan", "Tidur siang saat belajar", "Makan es krim saat mandi"],
+			"answer": "Jika hujan, maka pakailah payung",
+			"hint": "Kondisinya adalah Hujan, keputusannya adalah Pakai Payung!",
+			"explanation": "'Jika hujan' adalah kondisi, dan 'pakailah payung' adalah tindakan yang diambil."
+		}`,
+	)
+
+	_, _ = db.Exec(
+		`INSERT OR IGNORE INTO activities (id, lesson_id, type, sort_order, question_json, max_score)
+		 VALUES (18, 11, 'block_code', 2, ?, 10)`,
+		`{
+			"prompt": "Susun blok kode kondisi: Jika Ada Rintangan ⚠️ -> Belok Kiri ⬅️ -> Maju ⬆️!",
+			"available_blocks": ["Maju ⬆️", "Belok Kiri ⬅️", "Jika Ada Rintangan ⚠️", "Ulangi 3x 🔄"],
+			"expected_order": ["Jika Ada Rintangan ⚠️", "Belok Kiri ⬅️", "Maju ⬆️"],
+			"hint": "Mulailah dengan blok pengandaian 'Jika Ada Rintangan ⚠️'!",
+			"explanation": "Blok kondisi memeriksa adanya rintangan terlebih dahulu sebelum berbelok dan maju."
+		}`,
+	)
+
+	// 12. Coding Level 3 Lesson 2: Debugging & Mencari Kesalahan Kode
+	_, _ = db.Exec(
+		`INSERT OR IGNORE INTO lessons (id, category_id, age_group, level, sort_order, title, description, content_json, estimated_minutes, xp_reward)
+		 VALUES (12, ?, 'builders', 3, 2, 'Debugging & Perbaikan Kode', 'Menemukan dan memperbaiki error/bug dalam urutan kode', 
+		 '{"intro_text":"Programmer hebat adalah yang jago menemukan Bug (kesalahan kode) dan memperbaikinya!","icon":"🐛"}', 15, 30)`,
+		codingCatID,
+	)
+
+	_, _ = db.Exec(
+		`INSERT OR IGNORE INTO activities (id, lesson_id, type, sort_order, question_json, max_score)
+		 VALUES (19, 12, 'multiple_choice', 1, ?, 10)`,
+		`{
+			"prompt": "Istilah untuk kesalahan atau masalah pada kode komputer disebut apa?",
+			"options": ["Bug", "Cat", "Fish", "Bird"],
+			"answer": "Bug",
+			"hint": "Sesuai nama serangga kecil dalam bahasa Inggris!",
+			"explanation": "Kesalahan atau cacat pada program komputer secara historis disebut 'Bug'."
+		}`,
+	)
+
+	_, _ = db.Exec(
+		`INSERT OR IGNORE INTO activities (id, lesson_id, type, sort_order, question_json, max_score)
+		 VALUES (20, 12, 'drag_drop', 2, ?, 10)`,
+		`{
+			"prompt": "Urutkan proses Debugging yang benar!",
+			"items": ["Perbaiki kesalahan", "Temukan posisi bug", "Jalankan ulang kode", "Amati masalah"],
+			"expected_order": ["Amati masalah", "Temukan posisi bug", "Perbaiki kesalahan", "Jalankan ulang kode"],
+			"hint": "Amati dulu masalahnya sebelum mencari posisi bug!",
+			"explanation": "Urutan debugging: Amati masalah -> Temukan posisi bug -> Perbaiki kesalahan -> Jalankan ulang kode."
+		}`,
+	)
+
+	fmt.Println("Seeded Math (L1-L3) & Coding (L1-L3) curriculum content for Builders group")
 	return nil
 }

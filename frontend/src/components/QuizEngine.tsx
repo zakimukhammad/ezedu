@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'preact/hooks';
 import { lessonsApi, activitiesApi } from '../lib/api';
 import { sounds } from '../lib/sound';
+import BlockCodingEngine from './BlockCodingEngine';
 
 interface Activity {
   id: number;
@@ -42,6 +43,7 @@ export default function QuizEngine({ lessonId }: Props) {
   const [selectedChoice, setSelectedChoice] = useState<string>('');
   const [fillAnswer, setFillAnswer] = useState<string>('');
   const [dragItems, setDragItems] = useState<string[]>([]);
+  const [blockAnswer, setBlockAnswer] = useState<string[]>([]);
   const [submitted, setSubmitted] = useState(false);
   const [feedback, setFeedback] = useState<{ isCorrect: boolean; text: string; hint?: string; explanation?: string } | null>(null);
   const [submitting, setSubmitting] = useState(false);
@@ -78,7 +80,6 @@ export default function QuizEngine({ lessonId }: Props) {
       });
       setMaxPossibleScore(totalMax);
 
-      // Init first activity state
       if (data.activities?.length > 0) {
         initActivityState(data.activities[0]);
       }
@@ -88,6 +89,7 @@ export default function QuizEngine({ lessonId }: Props) {
   const initActivityState = (act: Activity) => {
     setSelectedChoice('');
     setFillAnswer('');
+    setBlockAnswer([]);
     setSubmitted(false);
     setFeedback(null);
     setShowHint(false);
@@ -132,6 +134,9 @@ export default function QuizEngine({ lessonId }: Props) {
       answer = fillAnswer.trim();
     } else if (currentActivity.type === 'drag_drop' || currentActivity.type === 'sequencing') {
       answer = dragItems;
+    } else if (currentActivity.type === 'block_code') {
+      if (blockAnswer.length === 0) return;
+      answer = blockAnswer;
     }
 
     setSubmitting(true);
@@ -251,7 +256,13 @@ export default function QuizEngine({ lessonId }: Props) {
       {/* Main Question Card */}
       <div class={`quiz-card card mt-lg animate-fade-in ${feedback && !feedback.isCorrect ? 'shake-card' : ''}`}>
         <div class="quiz-type-badge">
-          {currentActivity.type === 'multiple_choice' ? '💡 Pilihan Ganda' : currentActivity.type === 'fill_blank' ? '✏️ Ketik Jawaban' : '🧩 Seret & Urutkan'}
+          {currentActivity.type === 'multiple_choice'
+            ? '💡 Pilihan Ganda'
+            : currentActivity.type === 'fill_blank'
+            ? '✏️ Ketik Jawaban'
+            : currentActivity.type === 'block_code'
+            ? '🤖 Blok Koding'
+            : '🧩 Seret & Urutkan'}
         </div>
 
         <h2 class="quiz-prompt mt-md">{currentQuestion?.prompt}</h2>
@@ -290,6 +301,15 @@ export default function QuizEngine({ lessonId }: Props) {
               autoFocus
             />
           </div>
+        )}
+
+        {/* Visual Block Coding Component */}
+        {currentActivity.type === 'block_code' && (
+          <BlockCodingEngine
+            availableBlocks={currentQuestion?.available_blocks || []}
+            onChange={setBlockAnswer}
+            disabled={submitted && feedback?.isCorrect}
+          />
         )}
 
         {/* Drag & Drop / Sequencing Component */}
@@ -361,7 +381,8 @@ export default function QuizEngine({ lessonId }: Props) {
               disabled={
                 submitting ||
                 (currentActivity.type === 'multiple_choice' && !selectedChoice) ||
-                (currentActivity.type === 'fill_blank' && !fillAnswer.trim())
+                (currentActivity.type === 'fill_blank' && !fillAnswer.trim()) ||
+                (currentActivity.type === 'block_code' && blockAnswer.length === 0)
               }
               onClick={handleSubmit}
               id="quiz-submit-btn"

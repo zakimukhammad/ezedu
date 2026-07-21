@@ -3,6 +3,7 @@ package store
 import (
 	"database/sql"
 	"fmt"
+	"strings"
 	"time"
 
 	_ "modernc.org/sqlite"
@@ -47,7 +48,7 @@ func Migrate(db *sql.DB) error {
 			account_id INTEGER NOT NULL REFERENCES accounts(id) ON DELETE CASCADE,
 			name TEXT NOT NULL,
 			birth_year INTEGER NOT NULL,
-			age_group TEXT NOT NULL CHECK(age_group IN ('explorers', 'builders', 'challengers')),
+			age_group TEXT NOT NULL CHECK(age_group IN ('toddlers', 'explorers', 'builders', 'challengers')),
 			avatar_id INTEGER DEFAULT 1,
 			xp_total INTEGER DEFAULT 0,
 			current_level INTEGER DEFAULT 1,
@@ -70,7 +71,7 @@ func Migrate(db *sql.DB) error {
 		`CREATE TABLE IF NOT EXISTS lessons (
 			id INTEGER PRIMARY KEY AUTOINCREMENT,
 			category_id INTEGER NOT NULL REFERENCES categories(id),
-			age_group TEXT NOT NULL CHECK(age_group IN ('explorers', 'builders', 'challengers')),
+			age_group TEXT NOT NULL CHECK(age_group IN ('toddlers', 'explorers', 'builders', 'challengers')),
 			level INTEGER NOT NULL CHECK(level BETWEEN 1 AND 5),
 			sort_order INTEGER DEFAULT 0,
 			title TEXT NOT NULL,
@@ -155,6 +156,54 @@ func Migrate(db *sql.DB) error {
 		}
 	}
 
+	// Dynamic schema upgrade for pre-existing SQLite databases missing 'toddlers' in CHECK constraint
+	var childrenDDL string
+	err := db.QueryRow(`SELECT sql FROM sqlite_master WHERE type='table' AND name='children'`).Scan(&childrenDDL)
+	if err == nil && !strings.Contains(childrenDDL, "toddlers") {
+		_, _ = db.Exec(`PRAGMA foreign_keys=OFF;`)
+		_, _ = db.Exec(`CREATE TABLE children_new (
+			id INTEGER PRIMARY KEY AUTOINCREMENT,
+			account_id INTEGER NOT NULL REFERENCES accounts(id) ON DELETE CASCADE,
+			name TEXT NOT NULL,
+			birth_year INTEGER NOT NULL,
+			age_group TEXT NOT NULL CHECK(age_group IN ('toddlers', 'explorers', 'builders', 'challengers')),
+			avatar_id INTEGER DEFAULT 1,
+			xp_total INTEGER DEFAULT 0,
+			current_level INTEGER DEFAULT 1,
+			streak_days INTEGER DEFAULT 0,
+			last_active DATE,
+			daily_limit_min INTEGER,
+			created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+		);`)
+		_, _ = db.Exec(`INSERT INTO children_new SELECT * FROM children;`)
+		_, _ = db.Exec(`DROP TABLE children;`)
+		_, _ = db.Exec(`ALTER TABLE children_new RENAME TO children;`)
+		_, _ = db.Exec(`PRAGMA foreign_keys=ON;`)
+	}
+
+	var lessonsDDL string
+	err = db.QueryRow(`SELECT sql FROM sqlite_master WHERE type='table' AND name='lessons'`).Scan(&lessonsDDL)
+	if err == nil && !strings.Contains(lessonsDDL, "toddlers") {
+		_, _ = db.Exec(`PRAGMA foreign_keys=OFF;`)
+		_, _ = db.Exec(`CREATE TABLE lessons_new (
+			id INTEGER PRIMARY KEY AUTOINCREMENT,
+			category_id INTEGER NOT NULL REFERENCES categories(id),
+			age_group TEXT NOT NULL CHECK(age_group IN ('toddlers', 'explorers', 'builders', 'challengers')),
+			level INTEGER NOT NULL CHECK(level BETWEEN 1 AND 5),
+			sort_order INTEGER DEFAULT 0,
+			title TEXT NOT NULL,
+			description TEXT DEFAULT '',
+			content_json TEXT DEFAULT '{}',
+			estimated_minutes INTEGER DEFAULT 10,
+			xp_reward INTEGER DEFAULT 10,
+			created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+		);`)
+		_, _ = db.Exec(`INSERT INTO lessons_new SELECT * FROM lessons;`)
+		_, _ = db.Exec(`DROP TABLE lessons;`)
+		_, _ = db.Exec(`ALTER TABLE lessons_new RENAME TO lessons;`)
+		_, _ = db.Exec(`PRAGMA foreign_keys=ON;`)
+	}
+
 	return nil
 }
 
@@ -165,6 +214,7 @@ func SeedDefaults(db *sql.DB) error {
 		slug, name, description, icon, color string
 		sortOrder                            int
 	}{
+		{"toddlers", "Mengenal Dunia", "Eksplorasi sensorik, bentuk, warna, dan suara hewan untuk balita", "sparkles", "#f59e0b", 0},
 		{"math", "Matematika", "Belajar angka, hitung, dan geometri", "calculator", "#f59e0b", 1},
 		{"science", "Sains & Alam", "Jelajahi dunia sains dan alam sekitar", "microscope", "#10b981", 2},
 		{"coding", "Koding & Logika", "Belajar dasar pemrograman dan berpikir logis", "code", "#6366f1", 3},

@@ -120,7 +120,7 @@ func AgeGroupFromBirthYear(birthYear, currentYear int) string {
 	case age >= 10 && age <= 12:
 		return "challengers"
 	case age < 4:
-		return "explorers"
+		return "toddlers"
 	default:
 		return "challengers"
 	}

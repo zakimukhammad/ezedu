@@ -346,7 +346,7 @@ export default function ProfileSelector() {
                   value={birthYear}
                   onChange={(e) => setBirthYear(Number((e.target as HTMLSelectElement).value))}
                 >
-                  {Array.from({ length: 13 }, (_, i) => 2014 + i).reverse().map(year => (
+                  {Array.from({ length: 13 }, (_, i) => (new Date().getFullYear() - 12) + i).reverse().map(year => (
                     <option key={year} value={year}>{year}</option>
                   ))}
                 </select>

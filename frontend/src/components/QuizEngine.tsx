@@ -2,6 +2,7 @@ import { useState, useEffect } from 'preact/hooks';
 import { lessonsApi, activitiesApi } from '../lib/api';
 import { sounds } from '../lib/sound';
 import BlockCodingEngine from './BlockCodingEngine';
+import ToddlerEngine from './ToddlerEngine';
 
 interface Activity {
   id: number;
@@ -15,6 +16,7 @@ interface Activity {
 interface Lesson {
   id: number;
   category_id: number;
+  age_group?: string;
   title: string;
   description: string;
   content_json: string;
@@ -317,6 +319,24 @@ export default function QuizEngine({ lessonId }: Props) {
   }
 
   const progressPercent = Math.round(((currentIndex + 1) / activities.length) * 100);
+
+  if (lesson?.age_group === 'toddlers') {
+    return (
+      <div class="quiz-engine-view container theme-toddler">
+        <div class="quiz-top-bar mb-md">
+          <a href="/beranda" class="close-quiz-btn">✕ Keluar</a>
+          <span class="quiz-progress-text">{currentIndex + 1} dari {activities.length} Soal</span>
+        </div>
+        <ToddlerEngine
+          activity={currentActivity}
+          onComplete={(score) => {
+            setTotalScore((prev) => prev + score);
+            handleNextActivity();
+          }}
+        />
+      </div>
+    );
+  }
 
   return (
     <div class="quiz-engine-view container">

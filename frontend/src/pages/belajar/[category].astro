@@ -4,6 +4,7 @@ import CategoryLessons from '../../components/CategoryLessons.tsx';
 
 export function getStaticPaths() {
   return [
+    { params: { category: 'toddlers' } },
     { params: { category: 'math' } },
     { params: { category: 'science' } },
     { params: { category: 'coding' } },

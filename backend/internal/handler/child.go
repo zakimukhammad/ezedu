@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 	"strconv"
+	"time"
 
 	"github.com/ezedu/backend/internal/auth"
 	"github.com/ezedu/backend/internal/store"
@@ -60,7 +61,8 @@ func (h *ChildHandler) Create(w http.ResponseWriter, r *http.Request) {
 		writeJSON(w, http.StatusBadRequest, map[string]string{"error": "Nama anak wajib diisi"})
 		return
 	}
-	if req.BirthYear < 2010 || req.BirthYear > 2024 {
+	currentYear := time.Now().Year()
+	if req.BirthYear < currentYear-16 || req.BirthYear > currentYear {
 		writeJSON(w, http.StatusBadRequest, map[string]string{"error": "Tahun lahir tidak valid"})
 		return
 	}
@@ -122,6 +124,12 @@ func (h *ChildHandler) Update(w http.ResponseWriter, r *http.Request) {
 	}
 	if req.AvatarID == 0 {
 		req.AvatarID = existing.AvatarID
+	}
+
+	currentYear := time.Now().Year()
+	if req.BirthYear < currentYear-16 || req.BirthYear > currentYear {
+		writeJSON(w, http.StatusBadRequest, map[string]string{"error": "Tahun lahir tidak valid"})
+		return
 	}
 
 	if err := h.children.Update(childID, accountID, req.Name, req.BirthYear, req.AvatarID); err != nil {

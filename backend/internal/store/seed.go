@@ -359,6 +359,108 @@ func SeedCurriculum(db *sql.DB) error {
 		}`,
 	)
 
-	fmt.Println("Seeded Math (L1-L3) & Coding (L1-L3) curriculum content for Builders group")
+	// ==========================================
+	// TODDLER LESSONS ("MENGENAL DUNIA": L1)
+	// ==========================================
+	var toddlerCatID int64
+	err = db.QueryRow(`SELECT id FROM categories WHERE slug = 'toddlers'`).Scan(&toddlerCatID)
+	if err == nil && toddlerCatID > 0 {
+		// 1. Toddler Lesson 1: Bentuk & Warna Dasar
+		_, _ = db.Exec(
+			`INSERT OR IGNORE INTO lessons (id, category_id, age_group, level, sort_order, title, description, content_json, estimated_minutes, xp_reward)
+			 VALUES (21, ?, 'toddlers', 1, 1, 'Bentuk & Warna Dasar', 'Mengenal lingkaran, persegi, dan warna-warni', 
+			 '{"intro_text":"Lihat bentuk dan warna yang indah ini! Sentuh gambar untuk mendengar namanya!","icon":"🟡"}', 5, 10)`,
+			toddlerCatID,
+		)
+		_, _ = db.Exec(
+			`INSERT OR IGNORE INTO activities (id, lesson_id, type, sort_order, question_json, max_score)
+			 VALUES (21, 21, 'multiple_choice', 1, ?, 10)`,
+			`{
+				"prompt": "Mana gambar Lingkaran Kuning 🟡?",
+				"options": ["Lingkaran Kuning 🟡", "Persegi Biru 🟦", "Segitiga Merah 🔺"],
+				"answer": "Lingkaran Kuning 🟡",
+				"hint": "Cari yang berbentuk bulat dan berwarna kuning cerah!",
+				"explanation": "Pintar! Ini adalah Lingkaran Kuning 🟡."
+			}`,
+		)
+
+		// 2. Toddler Lesson 2: Suara Hewan Ceria
+		_, _ = db.Exec(
+			`INSERT OR IGNORE INTO lessons (id, category_id, age_group, level, sort_order, title, description, content_json, estimated_minutes, xp_reward)
+			 VALUES (22, ?, 'toddlers', 1, 2, 'Suara Hewan Ceria', 'Mengenal suara sapi, kucing, dan ayam', 
+			 '{"intro_text":"Dengarkan suara hewan lucu di sekitarmu!","icon":"🐮"}', 5, 10)`,
+			toddlerCatID,
+		)
+		_, _ = db.Exec(
+			`INSERT OR IGNORE INTO activities (id, lesson_id, type, sort_order, question_json, max_score)
+			 VALUES (22, 22, 'multiple_choice', 1, ?, 10)`,
+			`{
+				"prompt": "Hewan manakah yang bersuara 'Muuu... Muuu...' 🐮?",
+				"options": ["Sapi 🐮", "Kucing 🐱", "Bebek 🦆"],
+				"answer": "Sapi 🐮",
+				"hint": "Sapi penghasil susu yang bersuara Muuu!",
+				"explanation": "Hebat! Sapi 🐮 bersuara Muuu!"
+			}`,
+		)
+
+		// 3. Toddler Lesson 3: Benda & Kendaraan
+		_, _ = db.Exec(
+			`INSERT OR IGNORE INTO lessons (id, category_id, age_group, level, sort_order, title, description, content_json, estimated_minutes, xp_reward)
+			 VALUES (23, ?, 'toddlers', 1, 3, 'Benda & Kendaraan', 'Mengenal mobil, sepeda, dan bola', 
+			 '{"intro_text":"Ayo kenali benda-benda dan kendaraan favoritmu!","icon":"🚗"}', 5, 10)`,
+			toddlerCatID,
+		)
+		_, _ = db.Exec(
+			`INSERT OR IGNORE INTO activities (id, lesson_id, type, sort_order, question_json, max_score)
+			 VALUES (23, 23, 'multiple_choice', 1, ?, 10)`,
+			`{
+				"prompt": "Mana kendaraan Mobil Merah 🚗?",
+				"options": ["Mobil Merah 🚗", "Sepeda 🚲", "Bola ⚽"],
+				"answer": "Mobil Merah 🚗",
+				"hint": "Mobil memiliki roda dan bersuara Brumm!",
+				"explanation": "Luar biasa! Ini adalah Mobil Merah 🚗."
+			}`,
+		)
+
+		// 4. Toddler Lesson 4: Buah & Tanaman Segar
+		_, _ = db.Exec(
+			`INSERT OR IGNORE INTO lessons (id, category_id, age_group, level, sort_order, title, description, content_json, estimated_minutes, xp_reward)
+			 VALUES (24, ?, 'toddlers', 1, 4, 'Buah & Tanaman Segar', 'Mengenal buah apel, pisang, dan jeruk', 
+			 '{"intro_text":"Buah-buahan sangat sehat dan rasanya lezat!","icon":"🍎"}', 5, 10)`,
+			toddlerCatID,
+		)
+		_, _ = db.Exec(
+			`INSERT OR IGNORE INTO activities (id, lesson_id, type, sort_order, question_json, max_score)
+			 VALUES (24, 24, 'multiple_choice', 1, ?, 10)`,
+			`{
+				"prompt": "Mana buah Apel Merah 🍎?",
+				"options": ["Apel Merah 🍎", "Pisang Kuning 🍌", "Jeruk 🍊"],
+				"answer": "Apel Merah 🍎",
+				"hint": "Apel berwarna merah manis!",
+				"explanation": "Yum! Apel Merah 🍎 sangat manis dan sehat."
+			}`,
+		)
+
+		// 5. Toddler Lesson 5: Angka & Huruf Pertama
+		_, _ = db.Exec(
+			`INSERT OR IGNORE INTO lessons (id, category_id, age_group, level, sort_order, title, description, content_json, estimated_minutes, xp_reward)
+			 VALUES (25, ?, 'toddlers', 1, 5, 'Angka & Huruf Pertama', 'Belajar angka 1–5 dan huruf vokal A-I-U-E-O', 
+			 '{"intro_text":"Ayo mengenal angka awal dan bunyi huruf pertama!","icon":"🅰️"}', 5, 10)`,
+			toddlerCatID,
+		)
+		_, _ = db.Exec(
+			`INSERT OR IGNORE INTO activities (id, lesson_id, type, sort_order, question_json, max_score)
+			 VALUES (25, 25, 'multiple_choice', 1, ?, 10)`,
+			`{
+				"prompt": "Manakah Huruf Vokal A 🅰️?",
+				"options": ["Huruf A 🅰️", "Angka 1 1️⃣", "Huruf O ⭕"],
+				"answer": "Huruf A 🅰️",
+				"hint": "Huruf pertama dalam abjad: A seperti Apel!",
+				"explanation": "Hebat sekali! Huruf A 🅰️ adalah awal kata Apel."
+			}`,
+		)
+	}
+
+	fmt.Println("Seeded Math, Coding, and Toddler 'Mengenal Dunia' curriculum content")
 	return nil
 }

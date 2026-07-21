@@ -21,6 +21,7 @@ interface Child {
 }
 
 const CATEGORY_EMOJIS: Record<string, string> = {
+  toddlers: '🎈',
   math: '🧮',
   science: '🔬',
   coding: '💻',
@@ -32,12 +33,14 @@ const CATEGORY_EMOJIS: Record<string, string> = {
 const AVATAR_EMOJIS = ['🦁', '🐼', '🦊', '🐸', '🦄', '🐶', '🐱', '🐰'];
 
 const AGE_GROUP_THEMES: Record<string, string> = {
-  explorers: 'theme-explorers',
-  builders: 'theme-builders',
-  challengers: 'theme-challengers',
+  toddlers: 'theme-toddler',
+  explorers: 'theme-explorer',
+  builders: 'theme-builder',
+  challengers: 'theme-challenger',
 };
 
 const AGE_GROUP_GREETING: Record<string, string> = {
+  toddlers: 'Selamat datang, Adik Cilik! 🎈',
   explorers: 'Ayo kita mulai belajar! 🌟',
   builders: 'Siap belajar hari ini? 🚀',
   challengers: 'Tantangan hari ini menantimu! ⚡',

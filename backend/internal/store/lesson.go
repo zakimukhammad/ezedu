@@ -19,10 +19,11 @@ func NewLessonStore(db *sql.DB) *LessonStore {
 // ListByCategoryAndAgeGroup retrieves lessons for a specific category and age group.
 func (s *LessonStore) ListByCategoryAndAgeGroup(categoryID int64, ageGroup string) ([]model.Lesson, error) {
 	rows, err := s.db.Query(
-		`SELECT id, category_id, age_group, level, sort_order, title, description, content_json, estimated_minutes, xp_reward
-		 FROM lessons 
-		 WHERE category_id = ? AND age_group = ?
-		 ORDER BY level ASC, sort_order ASC`,
+		`SELECT l.id, l.category_id, c.slug, l.age_group, l.level, l.sort_order, l.title, l.description, l.content_json, l.estimated_minutes, l.xp_reward
+		 FROM lessons l
+		 JOIN categories c ON l.category_id = c.id
+		 WHERE l.category_id = ? AND l.age_group = ?
+		 ORDER BY l.level ASC, l.sort_order ASC`,
 		categoryID, ageGroup,
 	)
 	if err != nil {
@@ -34,7 +35,7 @@ func (s *LessonStore) ListByCategoryAndAgeGroup(categoryID int64, ageGroup strin
 	for rows.Next() {
 		var l model.Lesson
 		if err := rows.Scan(
-			&l.ID, &l.CategoryID, &l.AgeGroup, &l.Level, &l.SortOrder,
+			&l.ID, &l.CategoryID, &l.CategorySlug, &l.AgeGroup, &l.Level, &l.SortOrder,
 			&l.Title, &l.Description, &l.ContentJSON, &l.EstimatedMinutes, &l.XPReward,
 		); err != nil {
 			return nil, fmt.Errorf("scan lesson: %w", err)
@@ -49,10 +50,12 @@ func (s *LessonStore) ListByCategoryAndAgeGroup(categoryID int64, ageGroup strin
 func (s *LessonStore) GetByID(id int64) (*model.Lesson, error) {
 	l := &model.Lesson{}
 	err := s.db.QueryRow(
-		`SELECT id, category_id, age_group, level, sort_order, title, description, content_json, estimated_minutes, xp_reward
-		 FROM lessons WHERE id = ?`, id,
+		`SELECT l.id, l.category_id, c.slug, l.age_group, l.level, l.sort_order, l.title, l.description, l.content_json, l.estimated_minutes, l.xp_reward
+		 FROM lessons l
+		 JOIN categories c ON l.category_id = c.id
+		 WHERE l.id = ?`, id,
 	).Scan(
-		&l.ID, &l.CategoryID, &l.AgeGroup, &l.Level, &l.SortOrder,
+		&l.ID, &l.CategoryID, &l.CategorySlug, &l.AgeGroup, &l.Level, &l.SortOrder,
 		&l.Title, &l.Description, &l.ContentJSON, &l.EstimatedMinutes, &l.XPReward,
 	)
 	if err == sql.ErrNoRows {

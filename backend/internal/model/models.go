@@ -43,6 +43,7 @@ type Category struct {
 type Lesson struct {
 	ID               int64  `json:"id"`
 	CategoryID       int64  `json:"category_id"`
+	CategorySlug     string `json:"category_slug,omitempty"`
 	AgeGroup         string `json:"age_group"`
 	Level            int    `json:"level"`
 	SortOrder        int    `json:"sort_order"`

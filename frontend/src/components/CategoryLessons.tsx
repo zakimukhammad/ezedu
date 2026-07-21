@@ -84,6 +84,16 @@ export default function CategoryLessons({ categorySlug }: Props) {
     );
   }
 
+  if (child && ((child.age_group === 'toddlers' && categorySlug !== 'toddlers') || (child.age_group !== 'toddlers' && categorySlug === 'toddlers'))) {
+    return (
+      <div class="lessons-error text-center" style="padding: var(--space-3xl); max-width: 600px; margin: 0 auto;">
+        <h2>Modul Ini Khusus Kelompok Usia Lain 🔒</h2>
+        <p class="text-muted mt-md">Materi ini disesuaikan khusus untuk kelompok usia lain. Yuk pilih kategori pelajaran yang sesuai dengan {child.name}!</p>
+        <a href="/beranda" class="btn btn-primary btn-lg mt-xl">Kembali ke Beranda 🚀</a>
+      </div>
+    );
+  }
+
   if (!category) {
     return (
       <div class="lessons-error text-center">

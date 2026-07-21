@@ -16,6 +16,7 @@ interface Activity {
 interface Lesson {
   id: number;
   category_id: number;
+  category_slug?: string;
   age_group?: string;
   title: string;
   description: string;
@@ -306,14 +307,20 @@ export default function QuizEngine({ lessonId }: Props) {
           </div>
         )}
 
-        <div class="mt-2xl" style="display: flex; gap: var(--space-md); flex-direction: column;">
-          <a href="/kemajuan" class="btn btn-secondary btn-lg w-full" id="finish-to-progress">
-            📊 Lihat Kemajuan
-          </a>
-          <a href="/beranda" class="btn btn-primary btn-lg w-full" id="finish-to-dashboard">
-            Lanjut Belajar 🚀
-          </a>
-        </div>
+        {/* Dynamic redirection back to the last module category page */}
+        {(() => {
+          const categoryUrl = lesson?.category_slug ? `/belajar/${lesson.category_slug}` : '/beranda';
+          return (
+            <div class="mt-2xl" style="display: flex; gap: var(--space-md); flex-direction: column;">
+              <a href="/kemajuan" class="btn btn-secondary btn-lg w-full" id="finish-to-progress">
+                📊 Lihat Kemajuan
+              </a>
+              <a href={categoryUrl} class="btn btn-primary btn-lg w-full" id="finish-to-dashboard">
+                Lanjut Belajar 🚀
+              </a>
+            </div>
+          );
+        })()}
       </div>
     );
   }

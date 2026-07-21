@@ -461,6 +461,216 @@ func SeedCurriculum(db *sql.DB) error {
 		)
 	}
 
-	fmt.Println("Seeded Math, Coding, and Toddler 'Mengenal Dunia' curriculum content")
+	// ==========================================
+	// SCIENCE LESSONS (BUILDERS: L1 - L3)
+	// ==========================================
+	var scienceCatID int64
+	err = db.QueryRow(`SELECT id FROM categories WHERE slug = 'science'`).Scan(&scienceCatID)
+	if err == nil && scienceCatID > 0 {
+		// Lesson 26: Hewan & Tempat Tinggalnya
+		_, _ = db.Exec(
+			`INSERT OR IGNORE INTO lessons (id, category_id, age_group, level, sort_order, title, description, content_json, estimated_minutes, xp_reward)
+			 VALUES (26, ?, 'builders', 1, 1, 'Hewan & Tempat Tinggalnya', 'Mengenal habitat hewan darat, air, dan udara', 
+			 '{"intro_text":"Setiap hewan memiliki tempat tinggal alamiah yang disebut habitat. Yuk pelajari!","icon":"🌿"}', 10, 20)`,
+			scienceCatID,
+		)
+		_, _ = db.Exec(
+			`INSERT OR IGNORE INTO activities (id, lesson_id, type, sort_order, question_json, max_score)
+			 VALUES (26, 26, 'multiple_choice', 1, ?, 10)`,
+			`{
+				"prompt": "Di manakah tempat tinggal (habitat) alami ikan 🐟?",
+				"options": ["Air 🌊", "Darat 🏜️", "Udara ☁️"],
+				"answer": "Air 🌊",
+				"hint": "Ikan bernapas menggunakan insang di dalam air!",
+				"explanation": "Ikan hidup di air laut atau sungai dan bernapas dengan insang."
+			}`,
+		)
+
+		// Lesson 27: Wujud Benda (Padat, Cair, Gas)
+		_, _ = db.Exec(
+			`INSERT OR IGNORE INTO lessons (id, category_id, age_group, level, sort_order, title, description, content_json, estimated_minutes, xp_reward)
+			 VALUES (27, ?, 'builders', 1, 2, 'Wujud Benda (Padat, Cair, Gas)', 'Membedakan tiga wujud benda di sekitar kita', 
+			 '{"intro_text":"Benda di sekitar kita dibagi menjadi 3 wujud: Padat, Cair, dan Gas!","icon":"🧊"}', 10, 20)`,
+			scienceCatID,
+		)
+		_, _ = db.Exec(
+			`INSERT OR IGNORE INTO activities (id, lesson_id, type, sort_order, question_json, max_score)
+			 VALUES (27, 27, 'drag_drop', 1, ?, 10)`,
+			`{
+				"prompt": "Urutkan contoh benda berikut berdasarkan wujudnya: [Padat, Cair, Gas]!",
+				"items": ["Air Minum 💧", "Batu 🪨", "Uap Air 💨"],
+				"expected_order": ["Batu 🪨", "Air Minum 💧", "Uap Air 💨"],
+				"hint": "Batu adalah benda Padat, Air Minum adalah Cair, Uap Air adalah Gas!",
+				"explanation": "Wujud benda: Batu (Padat) -> Air Minum (Cair) -> Uap Air (Gas)."
+			}`,
+		)
+
+		// Lesson 28: Daur Air & Terjadinya Hujan
+		_, _ = db.Exec(
+			`INSERT OR IGNORE INTO lessons (id, category_id, age_group, level, sort_order, title, description, content_json, estimated_minutes, xp_reward)
+			 VALUES (28, ?, 'builders', 2, 1, 'Daur Air & Terjadinya Hujan', 'Bagaimana air menguap dan turun menjadi hujan', 
+			 '{"intro_text":"Air di bumi terus berputar dalam siklus daur air yang menakjubkan!","icon":"🌧️"}', 12, 25)`,
+			scienceCatID,
+		)
+		_, _ = db.Exec(
+			`INSERT OR IGNORE INTO activities (id, lesson_id, type, sort_order, question_json, max_score)
+			 VALUES (28, 28, 'sequencing', 1, ?, 10)`,
+			`{
+				"prompt": "Urutkan proses Daur Air dari awal!",
+				"items": ["Air menguap karea panas", "Pengembunan menjadi awan", "Hujan turun ke bumi"],
+				"expected_order": ["Air menguap karea panas", "Pengembunan menjadi awan", "Hujan turun ke bumi"],
+				"hint": "Mulai dari air laut/sungai yang dipanaskan matahari!",
+				"explanation": "Daur air: Penguapan -> Pembentukan awan -> Hujan."
+			}`,
+		)
+
+		// Lesson 29: Tata Surya & Planet
+		_, _ = db.Exec(
+			`INSERT OR IGNORE INTO lessons (id, category_id, age_group, level, sort_order, title, description, content_json, estimated_minutes, xp_reward)
+			 VALUES (29, ?, 'builders', 3, 1, 'Tata Surya & Planet', 'Mengenal planet-planet yang mengelilingi matahari', 
+			 '{"intro_text":"Matahari adalah pusat tata surya yang dikelilingi oleh 8 planet hebat!","icon":"🪐"}', 15, 30)`,
+			scienceCatID,
+		)
+		_, _ = db.Exec(
+			`INSERT OR IGNORE INTO activities (id, lesson_id, type, sort_order, question_json, max_score)
+			 VALUES (29, 29, 'multiple_choice', 1, ?, 10)`,
+			`{
+				"prompt": "Planet manakah yang sering disebut sebagai 'Planet Merah' 🔴?",
+				"options": ["Mars 🔴", "Bumi 🌍", "Jupiter 🪐"],
+				"answer": "Mars 🔴",
+				"hint": "Planet ini tampak kemerahan karena permukaan besi oksida!",
+				"explanation": "Mars disebut Planet Merah karena kandungan besi oksida yang melimpah di permukaannya."
+			}`,
+		)
+	}
+
+	// ==========================================
+	// LANGUAGE LESSONS (BUILDERS: L1 - L3)
+	// ==========================================
+	var langCatID int64
+	err = db.QueryRow(`SELECT id FROM categories WHERE slug = 'language'`).Scan(&langCatID)
+	if err == nil && langCatID > 0 {
+		// Lesson 30: Abjad & Kosakata Dasar
+		_, _ = db.Exec(
+			`INSERT OR IGNORE INTO lessons (id, category_id, age_group, level, sort_order, title, description, content_json, estimated_minutes, xp_reward)
+			 VALUES (30, ?, 'builders', 1, 1, 'Abjad & Kosakata Dasar', 'Mengenal huruf dan kata-kata benda awal', 
+			 '{"intro_text":"Bahasa adalah kunci komunikasi. Yuk tambah kosakatamu!","icon":"🔤"}', 10, 20)`,
+			langCatID,
+		)
+		_, _ = db.Exec(
+			`INSERT OR IGNORE INTO activities (id, lesson_id, type, sort_order, question_json, max_score)
+			 VALUES (30, 30, 'multiple_choice', 1, ?, 10)`,
+			`{
+				"prompt": "Kata manakah yang diawali dengan huruf B 🅱️?",
+				"options": ["Buku 📖", "Apel 🍎", "Gajah 🐘"],
+				"answer": "Buku 📖",
+				"hint": "Buku diawali dengan huruf B!",
+				"explanation": "B - U - K - U diawali huruf B."
+			}`,
+		)
+
+		// Lesson 31: Tata Bahasa Dasar (Kata Kerja & Benda)
+		_, _ = db.Exec(
+			`INSERT OR IGNORE INTO lessons (id, category_id, age_group, level, sort_order, title, description, content_json, estimated_minutes, xp_reward)
+			 VALUES (31, ?, 'builders', 2, 1, 'Kata Kerja & Benda', 'Membedakan tindakan (kata kerja) dan nama benda', 
+			 '{"intro_text":"Kata kerja menyatakan tindakan, sedangkan kata benda menunjukkan barang atau orang!","icon":"✍️"}', 12, 25)`,
+			langCatID,
+		)
+		_, _ = db.Exec(
+			`INSERT OR IGNORE INTO activities (id, lesson_id, type, sort_order, question_json, max_score)
+			 VALUES (31, 31, 'multiple_choice', 1, ?, 10)`,
+			`{
+				"prompt": "Manakah di bawah ini yang termasuk KATA KERJA (Tindakan)?",
+				"options": ["Membaca 📖", "Meja 🪑", "Pensil ✏️"],
+				"answer": "Membaca 📖",
+				"hint": "Membaca adalah kegiatan/tindakan yang dilakukan seseorang!",
+				"explanation": "'Membaca' adalah kata kerja karena menunjukkan suatu aktivitas."
+			}`,
+		)
+
+		// Lesson 32: Membaca Paham & Ringkasan Cerita
+		_, _ = db.Exec(
+			`INSERT OR IGNORE INTO lessons (id, category_id, age_group, level, sort_order, title, description, content_json, estimated_minutes, xp_reward)
+			 VALUES (32, ?, 'builders', 3, 1, 'Membaca Paham & Cerita', 'Memahami isi bacaan pendek dan menjawab pertanyaan', 
+			 '{"intro_text":"Bacalah cerita pendek dengan cermat untuk menemukan jawabannya!","icon":"📚"}', 15, 30)`,
+			langCatID,
+		)
+		_, _ = db.Exec(
+			`INSERT OR IGNORE INTO activities (id, lesson_id, type, sort_order, question_json, max_score)
+			 VALUES (32, 32, 'multiple_choice', 1, ?, 10)`,
+			`{
+				"prompt": "Cerita: 'Budi membawa payung merah karena langit gelap mendung.' Mengapa Budi membawa payung?",
+				"options": ["Karena cuaca mendung 🌧️", "Karena cuaca panas ☀️", "Karena ingin bermain ⚽"],
+				"answer": "Karena cuaca mendung 🌧️",
+				"hint": "Budi mengamati langit gelap mendung!",
+				"explanation": "Budi membawa payung karena langit gelap mendung dan bersiap hujan."
+			}`,
+		)
+	}
+
+	// ==========================================
+	// LOGIC LESSONS (BUILDERS: L1 - L3)
+	// ==========================================
+	var logicCatID int64
+	err = db.QueryRow(`SELECT id FROM categories WHERE slug = 'logic'`).Scan(&logicCatID)
+	if err == nil && logicCatID > 0 {
+		// Lesson 33: Pola Gambar & Perbedaan
+		_, _ = db.Exec(
+			`INSERT OR IGNORE INTO lessons (id, category_id, age_group, level, sort_order, title, description, content_json, estimated_minutes, xp_reward)
+			 VALUES (33, ?, 'builders', 1, 1, 'Pola Gambar & Perbedaan', 'Melatih ketelitian dan pengenalan pola gambar', 
+			 '{"intro_text":"Amati bentuk dan warna pola dengan teliti!","icon":"🧩"}', 10, 20)`,
+			logicCatID,
+		)
+		_, _ = db.Exec(
+			`INSERT OR IGNORE INTO activities (id, lesson_id, type, sort_order, question_json, max_score)
+			 VALUES (33, 33, 'multiple_choice', 1, ?, 10)`,
+			`{
+				"prompt": "Lengkapi pola berikut: 🔴 - 🔵 - 🔴 - 🔵 - __ ?",
+				"options": ["🔴", "🔵", "🟡"],
+				"answer": "🔴",
+				"hint": "Polanya selang-seling antara Merah 🔴 dan Biru 🔵!",
+				"explanation": "Setelah Biru 🔵, pola berulang kembali ke Merah 🔴."
+			}`,
+		)
+
+		// Lesson 34: Labirin Logika & Jalur
+		_, _ = db.Exec(
+			`INSERT OR IGNORE INTO lessons (id, category_id, age_group, level, sort_order, title, description, content_json, estimated_minutes, xp_reward)
+			 VALUES (34, ?, 'builders', 2, 1, 'Labirin Logika & Jalur', 'Menemukan rute tercepat dan menyelesaikan teka-teki', 
+			 '{"intro_text":"Gunakan logika untuk memilih rute terbaik menuju tujuan!","icon":"🧭"}', 12, 25)`,
+			logicCatID,
+		)
+		_, _ = db.Exec(
+			`INSERT OR IGNORE INTO activities (id, lesson_id, type, sort_order, question_json, max_score)
+			 VALUES (34, 34, 'multiple_choice', 1, ?, 10)`,
+			`{
+				"prompt": "Jika jalur A ada rintangan ⚠️ dan jalur B aman 🟢, jalur mana yang harus dipilih?",
+				"options": ["Jalur B 🟢", "Jalur A ⚠️", "Kembali ke awal 🏁"],
+				"answer": "Jalur B 🟢",
+				"hint": "Pilihlah jalur yang aman tanpa rintangan!",
+				"explanation": "Jalur B aman (🟢) sehingga menjadi pilihan logis."
+			}`,
+		)
+
+		// Lesson 35: Pola Logika Angka (Sudoku Lite)
+		_, _ = db.Exec(
+			`INSERT OR IGNORE INTO lessons (id, category_id, age_group, level, sort_order, title, description, content_json, estimated_minutes, xp_reward)
+			 VALUES (35, ?, 'builders', 3, 1, 'Pola Logika Angka', 'Menemukan angka yang hilang dalam barisan pola', 
+			 '{"intro_text":"Temukan kelipatan dan rahasia di balik barisan angka!","icon":"🔢"}', 15, 30)`,
+			logicCatID,
+		)
+		_, _ = db.Exec(
+			`INSERT OR IGNORE INTO activities (id, lesson_id, type, sort_order, question_json, max_score)
+			 VALUES (35, 35, 'fill_blank', 1, ?, 10)`,
+			`{
+				"prompt": "Isi angka yang hilang dalam pola berikut: 2, 4, 6, __, 10 !",
+				"answer": "8",
+				"hint": "Pola ini bertambah 2 setiap langkahnya!",
+				"explanation": "6 + 2 = 8. Pola kelipatan 2: 2, 4, 6, 8, 10."
+			}`,
+		)
+	}
+
+	fmt.Println("Seeded Math, Coding, Toddler, Science, Language, and Logic curriculum content")
 	return nil
 }

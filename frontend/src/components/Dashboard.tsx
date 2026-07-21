@@ -74,37 +74,29 @@ export default function Dashboard() {
   const loadData = async (childData: Child) => {
     const { data: catData } = await categoriesApi.list();
     if (catData?.categories) {
-      setCategories(catData.categories);
+      const filtered = catData.categories.filter((cat: Category) => {
+        if (childData.age_group === 'toddlers') {
+          return cat.slug === 'toddlers';
+        }
+        return cat.slug !== 'toddlers';
+      });
+      setCategories(filtered);
     }
 
-    // Try finding next uncompleted lesson in Math or Coding
+    // Try finding next uncompleted lesson in the appropriate age group category
     try {
-      const { data: mathData } = await lessonsApi.listByCategory('math', childData.age_group, childData.id);
-      if (mathData?.lessons) {
-        const progMap = mathData.progress || {};
-        const uncompleted = mathData.lessons.find((l: any) => !progMap[l.id] || progMap[l.id].status !== 'completed');
+      const targetSlug = childData.age_group === 'toddlers' ? 'toddlers' : 'math';
+      const { data: targetData } = await lessonsApi.listByCategory(targetSlug, childData.age_group, childData.id);
+      if (targetData?.lessons) {
+        const progMap = targetData.progress || {};
+        const uncompleted = targetData.lessons.find((l: any) => !progMap[l.id] || progMap[l.id].status !== 'completed');
         if (uncompleted) {
           setNextLesson({
             id: uncompleted.id,
             title: uncompleted.title,
-            category_name: 'Matematika 🧮',
+            category_name: `${targetData.category?.name || 'Mengenal Dunia'} ${CATEGORY_EMOJIS[targetSlug] || '🎈'}`,
             description: uncompleted.description,
           });
-        } else {
-          // If Math is all completed, check Coding
-          const { data: codeData } = await lessonsApi.listByCategory('coding', childData.age_group, childData.id);
-          if (codeData?.lessons) {
-            const codeProgMap = codeData.progress || {};
-            const codeUncompleted = codeData.lessons.find((l: any) => !codeProgMap[l.id] || codeProgMap[l.id].status !== 'completed');
-            if (codeUncompleted) {
-              setNextLesson({
-                id: codeUncompleted.id,
-                title: codeUncompleted.title,
-                category_name: 'Koding & Logika 💻',
-                description: codeUncompleted.description,
-              });
-            }
-          }
         }
       }
     } catch(e) {}

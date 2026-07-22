@@ -8,6 +8,7 @@ import PixelArtEngine from './PixelArtEngine';
 import MathRacerEngine from './MathRacerEngine';
 import WordBuilderEngine from './WordBuilderEngine';
 import MazeLogicEngine from './MazeLogicEngine';
+import LevelUpModal from './LevelUpModal';
 
 interface Activity {
   id: number;
@@ -68,6 +69,7 @@ export default function QuizEngine({ lessonId }: Props) {
   const [isMuted, setIsMuted] = useState(() => sounds.isMuted());
   const [leveledUp, setLeveledUp] = useState(false);
   const [newLevel, setNewLevel] = useState(1);
+  const [showIntro, setShowIntro] = useState(true);
 
   const toggleSound = () => {
     const nextMuted = sounds.toggleMuted();
@@ -299,10 +301,55 @@ export default function QuizEngine({ lessonId }: Props) {
     );
   }
 
+  // Animated Lesson Intro Card
+  if (showIntro && lesson) {
+    const content = JSON.parse(lesson.content_json || '{}');
+    return (
+      <div class="quiz-engine-view container animate-fade-in">
+        <div class="quiz-top-bar mb-md">
+          <a href="/beranda" class="close-quiz-btn">✕ Keluar</a>
+        </div>
+        <div class="glass-card p-2xl text-center mt-md" style="background: linear-gradient(135deg, rgba(30, 27, 75, 0.9), rgba(15, 23, 42, 0.9)); border: 2px solid var(--color-primary); border-radius: var(--radius-xl);">
+          <div class="lesson-intro-icon animate-bounce" style="font-size: 4.5rem; margin-bottom: var(--space-sm);">
+            {content.icon || '🚀'}
+          </div>
+          <h1 class="mt-xs" style="font-size: 1.8rem; font-weight: 800; color: var(--color-text);">{lesson.title}</h1>
+          <p class="text-muted mt-sm" style="font-size: 1.05rem; max-width: 500px; margin-left: auto; margin-right: auto; line-height: 1.5;">
+            {content.intro_text || lesson.description || 'Siap untuk petualangan seru ini? Yuk mulai!'}
+          </p>
+
+          <div class="intro-meta-grid mt-xl flex-center gap-md" style="flex-wrap: wrap;">
+            <div class="meta-item flex-center gap-xs" style="background: rgba(99, 102, 241, 0.15); padding: var(--space-sm) var(--space-lg); border-radius: var(--radius-lg); border: 1px solid rgba(99, 102, 241, 0.3);">
+              <span style="font-size: 1.2rem;">⏱️</span>
+              <strong style="color: var(--color-primary-light);">{lesson.estimated_minutes} Menit</strong>
+            </div>
+            <div class="meta-item flex-center gap-xs" style="background: rgba(245, 158, 11, 0.15); padding: var(--space-sm) var(--space-lg); border-radius: var(--radius-lg); border: 1px solid rgba(245, 158, 11, 0.3);">
+              <span style="font-size: 1.2rem;">⭐</span>
+              <strong style="color: var(--color-secondary-light);">+{lesson.xp_reward} XP</strong>
+            </div>
+          </div>
+
+          <button
+            type="button"
+            class="btn btn-primary btn-lg w-full mt-2xl animate-pulse"
+            onClick={() => setShowIntro(false)}
+            id="start-lesson-btn"
+          >
+            Ayo Mulai Belajar! 🚀
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   // Summary Celebration Screen
   if (completed) {
     return (
       <div class="quiz-summary-card card animate-scale-in text-center">
+        {leveledUp && (
+          <LevelUpModal newLevel={newLevel} onClose={() => setLeveledUp(false)} />
+        )}
+
         <div class="celebration-emoji">🏆</div>
         <h2>Pelajaran Selesai!</h2>
         <p class="summary-subtitle text-muted mt-xs">Kamu sudah menyelesaikan <strong>{lesson.title}</strong></p>

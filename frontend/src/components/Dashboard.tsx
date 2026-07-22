@@ -188,6 +188,15 @@ export default function Dashboard() {
             </div>
           )}
         </div>
+        <div class="xp-progress-container mt-sm" style="background: rgba(255, 255, 255, 0.08); padding: var(--space-xs) var(--space-md); border-radius: var(--radius-lg); border: 1px solid rgba(255, 255, 255, 0.1);">
+          <div style="display: flex; justify-content: space-between; font-size: 0.8rem; font-weight: 700; color: var(--color-secondary-light); margin-bottom: 4px;">
+            <span>Progres Ke Level {child.current_level + 1} 🚀</span>
+            <span>{child.xp_total % 100} / 100 XP</span>
+          </div>
+          <div style="height: 10px; background: rgba(255, 255, 255, 0.12); border-radius: var(--radius-full); overflow: hidden;">
+            <div style={`width: ${child.xp_total % 100}%; height: 100%; background: linear-gradient(90deg, #f59e0b, #fbbf24); border-radius: var(--radius-full); transition: width 0.5s ease;`}></div>
+          </div>
+        </div>
       </section>
 
       {/* Daily Challenge Card */}

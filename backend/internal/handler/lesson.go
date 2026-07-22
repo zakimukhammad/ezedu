@@ -272,8 +272,16 @@ func (h *LessonHandler) CompleteLesson(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Update streak
-	_ = h.progress.UpdateStreak(req.ChildID)
+	// Check for Level-Up
+	updatedChild, _ := h.children.GetByID(req.ChildID, accountID)
+	levelUp := false
+	newLevel := 1
+	if updatedChild != nil {
+		newLevel = updatedChild.CurrentLevel
+		if child != nil && updatedChild.CurrentLevel > child.CurrentLevel {
+			levelUp = true
+		}
+	}
 
 	// Evaluate and award badges
 	var awardedBadges []map[string]interface{}
@@ -292,6 +300,8 @@ func (h *LessonHandler) CompleteLesson(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, http.StatusOK, map[string]interface{}{
 		"message":        "Selamat! Kamu berhasil menyelesaikan pelajaran 🎉",
 		"xp_earned":      xpReward,
+		"level_up":       levelUp,
+		"new_level":      newLevel,
 		"badges_awarded": awardedBadges,
 	})
 }

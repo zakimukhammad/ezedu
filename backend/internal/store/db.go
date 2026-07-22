@@ -271,18 +271,32 @@ func SeedDefaults(db *sql.DB) error {
 		}
 	}
 
-	// Seed initial badges (Bahasa Indonesia names)
+	// Seed initial badges (Bahasa Indonesia names - 21 total badges)
 	badges := []struct {
 		slug, name, description, icon string
 		criteriaJSON                  string
 	}{
 		{"first_lesson", "Langkah Pertama", "Selesaikan pelajaran pertamamu!", "badge-first", `{"type":"lessons_completed","value":1}`},
-		{"math_explorer", "Penjelajah Angka", "Selesaikan 5 pelajaran Matematika", "badge-math", `{"type":"category_lessons","category":"math","value":5}`},
-		{"coding_starter", "Pembuat Kode Pemula", "Selesaikan 5 pelajaran Koding", "badge-code", `{"type":"category_lessons","category":"coding","value":5}`},
+		{"three_lessons", "Pembelajar Giat", "Selesaikan 3 pelajaran", "badge-three", `{"type":"lessons_completed","value":3}`},
+		{"five_lessons", "Jagoan Belajar", "Selesaikan 5 pelajaran", "badge-five", `{"type":"lessons_completed","value":5}`},
+		{"ten_lessons", "Murid Rajin", "Selesaikan 10 pelajaran", "badge-ten", `{"type":"lessons_completed","value":10}`},
+		{"twenty_lessons", "Master Pelajaran", "Selesaikan 20 pelajaran", "badge-twenty", `{"type":"lessons_completed","value":20}`},
+		{"math_explorer", "Penjelajah Angka", "Selesaikan 3 pelajaran Matematika", "badge-math", `{"type":"category_lessons","category":"math","value":3}`},
+		{"coding_starter", "Pembuat Kode Pemula", "Selesaikan 3 pelajaran Koding", "badge-code", `{"type":"category_lessons","category":"coding","value":3}`},
+		{"science_junior", "Ilmuwan Cilik", "Selesaikan 3 pelajaran Sains", "badge-science", `{"type":"category_lessons","category":"science","value":3}`},
+		{"word_wizard", "Penyihir Kata", "Selesaikan 3 pelajaran Bahasa", "badge-language", `{"type":"category_lessons","category":"language","value":3}`},
+		{"logic_solver", "Pemecah Teka-Teki", "Selesaikan 3 pelajaran Logika", "badge-logic", `{"type":"category_lessons","category":"logic","value":3}`},
+		{"art_creator", "Seniman Kreatif", "Selesaikan 3 pelajaran Seni", "badge-art", `{"type":"category_lessons","category":"art","value":3}`},
+		{"toddler_star", "Bintang Cilik", "Selesaikan 3 pelajaran Mengenal Dunia", "badge-toddler", `{"type":"category_lessons","category":"toddlers","value":3}`},
 		{"streak_3", "Rajin Belajar", "Belajar 3 hari berturut-turut!", "badge-streak3", `{"type":"streak","value":3}`},
 		{"streak_7", "Bintang Mingguan", "Belajar 7 hari berturut-turut!", "badge-streak7", `{"type":"streak","value":7}`},
+		{"streak_14", "Pejuang Hebat", "Belajar 14 hari berturut-turut!", "badge-streak14", `{"type":"streak","value":14}`},
+		{"streak_30", "Pahlawan Belajar", "Belajar 30 hari berturut-turut!", "badge-streak30", `{"type":"streak","value":30}`},
 		{"perfect_quiz", "Nilai Sempurna", "Dapatkan skor sempurna di sebuah kuis!", "badge-perfect", `{"type":"perfect_score","value":1}`},
-		{"ten_lessons", "Murid Rajin", "Selesaikan 10 pelajaran", "badge-ten", `{"type":"lessons_completed","value":10}`},
+		{"xp_100", "Pengumpul Bintang", "Capai total 100 XP!", "badge-xp100", `{"type":"xp_total","value":100}`},
+		{"xp_500", "Bintang Cemerlang", "Capai total 500 XP!", "badge-xp500", `{"type":"xp_total","value":500}`},
+		{"level_2", "Naik Level 2", "Berhasil mencapai Level 2!", "badge-level2", `{"type":"level","value":2}`},
+		{"level_5", "Puncak Prestasi", "Berhasil mencapai Level 5!", "badge-level5", `{"type":"level","value":5}`},
 	}
 
 	for _, b := range badges {

@@ -93,8 +93,21 @@ func (s *BadgeStore) EvaluateAndAwardBadges(childID int64) ([]model.Badge, error
 	var perfectScores int
 	_ = s.db.QueryRow(`SELECT COUNT(*) FROM child_progress WHERE child_id = ? AND score >= max_possible AND max_possible > 0`, childID).Scan(&perfectScores)
 
-	var streakDays int
-	_ = s.db.QueryRow(`SELECT streak_days FROM children WHERE id = ?`, childID).Scan(&streakDays)
+	var xpTotal, currentLevel, streakDays int
+	_ = s.db.QueryRow(`SELECT xp_total, current_level, streak_days FROM children WHERE id = ?`, childID).Scan(&xpTotal, &currentLevel, &streakDays)
+
+	// Fetch category completion counts helper
+	getCategoryCompleted := func(slug string) int {
+		var count int
+		_ = s.db.QueryRow(
+			`SELECT COUNT(*) FROM child_progress cp 
+			 JOIN lessons l ON cp.lesson_id = l.id 
+			 JOIN categories c ON l.category_id = c.id 
+			 WHERE cp.child_id = ? AND cp.status = 'completed' AND c.slug = ?`,
+			childID, slug,
+		).Scan(&count)
+		return count
+	}
 
 	var newlyAwarded []model.Badge
 
@@ -119,9 +132,7 @@ func (s *BadgeStore) EvaluateAndAwardBadges(childID int64) ([]model.Badge, error
 				shouldAward = true
 			}
 		case "category_lessons":
-			if crit.Category == "math" && mathCompleted >= crit.Value {
-				shouldAward = true
-			} else if crit.Category == "coding" && codingCompleted >= crit.Value {
+			if getCategoryCompleted(crit.Category) >= crit.Value {
 				shouldAward = true
 			}
 		case "perfect_score":
@@ -130,6 +141,14 @@ func (s *BadgeStore) EvaluateAndAwardBadges(childID int64) ([]model.Badge, error
 			}
 		case "streak":
 			if streakDays >= crit.Value {
+				shouldAward = true
+			}
+		case "xp_total":
+			if xpTotal >= crit.Value {
+				shouldAward = true
+			}
+		case "level":
+			if currentLevel >= crit.Value {
 				shouldAward = true
 			}
 		}

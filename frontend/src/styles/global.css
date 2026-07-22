@@ -610,3 +610,19 @@ img {
   transform: scale(1.08);
   z-index: 2;
 }
+
+/* Offline Mode Banner */
+.offline-banner {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  background: linear-gradient(135deg, #f59e0b, #d97706);
+  color: #0f172a;
+  padding: 8px 16px;
+  text-align: center;
+  font-weight: 700;
+  font-size: 0.85rem;
+  z-index: 9999;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+}

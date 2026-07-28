@@ -232,9 +232,25 @@ export default function QuizEngine({ lessonId }: Props) {
       setCurrentIndex(nextIdx);
       initActivityState(activities[nextIdx]);
     } else {
-      finishLessonWithScore(calculatedTotalScore, activeChild);
+      if (activeChild) {
+        try {
+          const timeSpentSec = Math.round((Date.now() - startTime) / 1000);
+          await lessonsApi.complete(
+            lesson!.id,
+            activeChild.id,
+            calculatedTotalScore,
+            maxPossibleScore || 10,
+            timeSpentSec
+          );
+        } catch (e) {
+          console.warn('Lesson completion API call error:', e);
+        }
+      }
+      const categoryUrl = lesson?.category_slug ? `/belajar/${lesson.category_slug}` : '/beranda';
+      window.location.href = categoryUrl;
     }
   };
+
 
   const finishLessonWithScore = async (finalScore: number, activeChild: Child | null) => {
     if (!lesson) return;

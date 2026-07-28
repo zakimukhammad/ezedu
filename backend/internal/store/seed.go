@@ -813,6 +813,668 @@ func SeedCurriculum(db *sql.DB) error {
 		_, _ = db.Exec(`UPDATE activities SET question_json = ? WHERE id = 41`, maze41JSON)
 	}
 
-	fmt.Println("Seeded Math, Coding, Toddler, Science, Language, Logic, and Art curriculum content")
+	// =========================================================================
+	// EXPLORERS LESSONS (4-6 YEARS: L1 - L3) & CHALLENGERS (10-12 YEARS: L1 - L3)
+	// =========================================================================
+	var mathID, codingID, scienceID, languageID, logicID, artID int64
+	_ = db.QueryRow(`SELECT id FROM categories WHERE slug = 'math'`).Scan(&mathID)
+	_ = db.QueryRow(`SELECT id FROM categories WHERE slug = 'coding'`).Scan(&codingID)
+	_ = db.QueryRow(`SELECT id FROM categories WHERE slug = 'science'`).Scan(&scienceID)
+	_ = db.QueryRow(`SELECT id FROM categories WHERE slug = 'language'`).Scan(&languageID)
+	_ = db.QueryRow(`SELECT id FROM categories WHERE slug = 'logic'`).Scan(&logicID)
+	_ = db.QueryRow(`SELECT id FROM categories WHERE slug = 'art'`).Scan(&artID)
+
+	// --- Explorers Math ---
+	_, _ = db.Exec(
+		`INSERT OR IGNORE INTO lessons (id, category_id, age_group, level, sort_order, title, description, content_json, estimated_minutes, xp_reward)
+		 VALUES (50, ?, 'explorers', 1, 1, 'Belajar Berhitung 1–10 🧮', 'Belajar menghitung benda dari 1 sampai 10', 
+		 '{"intro_text":"Halo adik pintar! Ayo belajar menghitung benda-benda lucu bersama! 🍎","icon":"🧮"}', 5, 10)`,
+		mathID,
+	)
+	_, _ = db.Exec(
+		`INSERT OR IGNORE INTO activities (id, lesson_id, type, sort_order, question_json, max_score)
+		 VALUES (50, 50, 'multiple_choice', 1, ?, 10)`,
+		`{
+			"prompt": "Berapa jumlah buah apel di gambar ini? 🍎🍎🍎",
+			"options": ["3 🍎", "5 🍎", "2 🍎"],
+			"answer": "3 🍎",
+			"hint": "Coba tunjuk dan hitung satu-satu: satu, dua, tiga!",
+			"explanation": "Benar! Ada 3 buah apel."
+		}`,
+	)
+
+	_, _ = db.Exec(
+		`INSERT OR IGNORE INTO lessons (id, category_id, age_group, level, sort_order, title, description, content_json, estimated_minutes, xp_reward)
+		 VALUES (51, ?, 'explorers', 2, 1, 'Mengenal Bentuk Dasar 🟡', 'Mengenal bentuk lingkaran, persegi, dan segitiga', 
+		 '{"intro_text":"Bentuk ada di mana-mana! Mari mengenali bentuk mainanmu! 🧸","icon":"🟡"}', 5, 10)`,
+		mathID,
+	)
+	_, _ = db.Exec(
+		`INSERT OR IGNORE INTO activities (id, lesson_id, type, sort_order, question_json, max_score)
+		 VALUES (51, 51, 'multiple_choice', 1, ?, 10)`,
+		`{
+			"prompt": "Bentuk apakah roda sepeda itu? 🚲",
+			"options": ["Lingkaran 🟡", "Persegi 🟦", "Segitiga 🔺"],
+			"answer": "Lingkaran 🟡",
+			"hint": "Roda sepeda berbentuk bulat dan bisa menggelinding!",
+			"explanation": "Benar! Roda berbentuk bulat atau lingkaran."
+		}`,
+	)
+
+	_, _ = db.Exec(
+		`INSERT OR IGNORE INTO lessons (id, category_id, age_group, level, sort_order, title, description, content_json, estimated_minutes, xp_reward)
+		 VALUES (52, ?, 'explorers', 3, 1, 'Pola Warna Bergantian 🔴', 'Belajar mengidentifikasi pola warna sederhana', 
+		 '{"intro_text":"Pola adalah urutan yang berulang. Ayo melengkapi pola warna! 🎨","icon":"🔴"}', 5, 10)`,
+		mathID,
+	)
+	_, _ = db.Exec(
+		`INSERT OR IGNORE INTO activities (id, lesson_id, type, sort_order, question_json, max_score)
+		 VALUES (52, 52, 'multiple_choice', 1, ?, 10)`,
+		`{
+			"prompt": "Lengkapi pola warna ini: 🟥 - 🟦 - 🟥 - 🟦 - __ ?",
+			"options": ["🟥", "🟦", "🟢"],
+			"answer": "🟥",
+			"hint": "Polanya selang-seling: merah, biru, merah, biru...",
+			"explanation": "Benar! Setelah biru kembali ke merah."
+		}`,
+	)
+
+	// --- Explorers Science ---
+	_, _ = db.Exec(
+		`INSERT OR IGNORE INTO lessons (id, category_id, age_group, level, sort_order, title, description, content_json, estimated_minutes, xp_reward)
+		 VALUES (53, ?, 'explorers', 1, 1, 'Hewan Darat & Air 🦁', 'Membedakan tempat hidup hewan darat dan air', 
+		 '{"intro_text":"Ada hewan yang tinggal di darat, dan ada yang di air. Yuk kita kelompokkan! 🐠","icon":"🦁"}', 5, 10)`,
+		scienceID,
+	)
+	_, _ = db.Exec(
+		`INSERT OR IGNORE INTO activities (id, lesson_id, type, sort_order, question_json, max_score)
+		 VALUES (53, 53, 'multiple_choice', 1, ?, 10)`,
+		`{
+			"prompt": "Hewan manakah yang hidup di dalam air laut? 🌊",
+			"options": ["Ikan Lumba-lumba 🐬", "Singa 🦁", "Burung Elang 🦅"],
+			"answer": "Ikan Lumba-lumba 🐬",
+			"hint": "Cari hewan yang berenang menggunakan sirip!",
+			"explanation": "Benar! Lumba-lumba tinggal dan berenang di dalam air."
+		}`,
+	)
+
+	_, _ = db.Exec(
+		`INSERT OR IGNORE INTO lessons (id, category_id, age_group, level, sort_order, title, description, content_json, estimated_minutes, xp_reward)
+		 VALUES (54, ?, 'explorers', 2, 1, 'Matahari & Bulan ☀️', 'Mengenal perbedaan siang dan malam hari', 
+		 '{"intro_text":"Tuhan menciptakan matahari untuk siang hari, dan bulan untuk malam hari! 🌙","icon":"☀️"}', 5, 10)`,
+		scienceID,
+	)
+	_, _ = db.Exec(
+		`INSERT OR IGNORE INTO activities (id, lesson_id, type, sort_order, question_json, max_score)
+		 VALUES (54, 54, 'multiple_choice', 1, ?, 10)`,
+		`{
+			"prompt": "Benda langit apa yang bersinar terang and membuat hari menjadi hangat di siang hari? ☀️",
+			"options": ["Matahari ☀️", "Bulan 🌙", "Bintang ✨"],
+			"answer": "Matahari ☀️",
+			"hint": "Benda ini berwarna kuning oranye cerah dan muncul saat kita sekolah!",
+			"explanation": "Hebat! Matahari menyinari bumi di siang hari."
+		}`,
+	)
+
+	_, _ = db.Exec(
+		`INSERT OR IGNORE INTO lessons (id, category_id, age_group, level, sort_order, title, description, content_json, estimated_minutes, xp_reward)
+		 VALUES (55, ?, 'explorers', 3, 1, 'Bagian Tubuh Kita 👀', 'Mengenal panca indra dan fungsinya', 
+		 '{"intro_text":"Tubuh kita luar biasa! Ayo belajar tentang panca indra kita! 👂","icon":"👀"}', 5, 10)`,
+		scienceID,
+	)
+	_, _ = db.Exec(
+		`INSERT OR IGNORE INTO activities (id, lesson_id, type, sort_order, question_json, max_score)
+		 VALUES (55, 55, 'multiple_choice', 1, ?, 10)`,
+		`{
+			"prompt": "Bagian tubuh mana yang kita gunakan untuk mendengarkan lagu dan cerita? 🎵",
+			"options": ["Telinga 👂", "Mata 👀", "Hidung 👃"],
+			"answer": "Telinga 👂",
+			"hint": "Letaknya ada di sebelah kanan dan kiri kepala kita!",
+			"explanation": "Tepat! Kita mendengarkan suara menggunakan telinga."
+		}`,
+	)
+
+	// --- Explorers Coding ---
+	_, _ = db.Exec(
+		`INSERT OR IGNORE INTO lessons (id, category_id, age_group, level, sort_order, title, description, content_json, estimated_minutes, xp_reward)
+		 VALUES (56, ?, 'explorers', 1, 1, 'Urutan Langkah Pagi 🌅', 'Belajar mengurutkan aktivitas sehari-hari', 
+		 '{"intro_text":"Koding adalah tentang urutan langkah yang benar! Mari urutkan kegiatan pagimu.","icon":"🌅"}', 5, 10)`,
+		codingID,
+	)
+	_, _ = db.Exec(
+		`INSERT OR IGNORE INTO activities (id, lesson_id, type, sort_order, question_json, max_score)
+		 VALUES (56, 56, 'drag_drop', 1, ?, 10)`,
+		`{
+			"prompt": "Urutkan kegiatan bangun pagi yang benar!",
+			"items": ["Mandi 🚿", "Bangun Tidur 🛌", "Sarapan Pagi 🍳"],
+			"expected_order": ["Bangun Tidur 🛌", "Mandi 🚿", "Sarapan Pagi 🍳"],
+			"hint": "Kita harus bangun dari tempat tidur terlebih dahulu!",
+			"explanation": "Pintar! Urutannya: Bangun tidur -> Mandi -> Sarapan."
+		}`,
+	)
+
+	_, _ = db.Exec(
+		`INSERT OR IGNORE INTO lessons (id, category_id, age_group, level, sort_order, title, description, content_json, estimated_minutes, xp_reward)
+		 VALUES (57, ?, 'explorers', 2, 1, 'Perintah Arah Kucing 🐱', 'Belajar arah maju, kiri, dan kanan sederhana', 
+		 '{"intro_text":"Ayo bantu kucing berjalan ke tujuannya dengan blok arah! ➡️","icon":"🐱"}', 5, 10)`,
+		codingID,
+	)
+	_, _ = db.Exec(
+		`INSERT OR IGNORE INTO activities (id, lesson_id, type, sort_order, question_json, max_score)
+		 VALUES (57, 57, 'block_code', 1, ?, 10)`,
+		`{
+			"prompt": "Susun perintah agar kucing melangkah: Maju, lalu Belok Kanan!",
+			"available_blocks": ["Maju ⬆️", "Belok Kanan ➡️", "Belok Kiri ⬅️"],
+			"expected_order": ["Maju ⬆️", "Belok Kanan ➡️"],
+			"hint": "Susun blok 'Maju ⬆️' terlebih dahulu, baru belok!",
+			"explanation": "Hebat! Kucing berhasil melangkah maju lalu belok kanan."
+		}`,
+	)
+
+	_, _ = db.Exec(
+		`INSERT OR IGNORE INTO lessons (id, category_id, age_group, level, sort_order, title, description, content_json, estimated_minutes, xp_reward)
+		 VALUES (58, ?, 'explorers', 3, 1, 'Ulang Langkah Seru 🔄', 'Mengenal konsep perulangan sederhana', 
+		 '{"intro_text":"Jika ingin melakukan hal yang sama berkali-kali, kita bisa menggunakan Loop/Pengulangan!","icon":"🔄"}', 5, 10)`,
+		codingID,
+	)
+	_, _ = db.Exec(
+		`INSERT OR IGNORE INTO activities (id, lesson_id, type, sort_order, question_json, max_score)
+		 VALUES (58, 58, 'multiple_choice', 1, ?, 10)`,
+		`{
+			"prompt": "Jika kita ingin berjalan ke depan sebanyak 3 kali, mana perintah yang paling singkat?",
+			"options": ["Ulangi 3x: Maju", "Maju, Mundur, Maju", "Maju 10x"],
+			"answer": "Ulangi 3x: Maju",
+			"hint": "Gunakan perintah 'Ulangi' untuk menghemat tenaga!",
+			"explanation": "Benar! Ulangi 3x membuat perintah menjadi sangat singkat."
+		}`,
+	)
+
+	// --- Explorers Language ---
+	_, _ = db.Exec(
+		`INSERT OR IGNORE INTO lessons (id, category_id, age_group, level, sort_order, title, description, content_json, estimated_minutes, xp_reward)
+		 VALUES (59, ?, 'explorers', 1, 1, 'Mengenal Huruf Vokal 🅰️', 'Belajar huruf vokal A, I, U, E, O', 
+		 '{"intro_text":"Huruf vokal sangat penting dalam kata. Yuk kenali bunyinya! 🍎","icon":"🅰️"}', 5, 10)`,
+		languageID,
+	)
+	_, _ = db.Exec(
+		`INSERT OR IGNORE INTO activities (id, lesson_id, type, sort_order, question_json, max_score)
+		 VALUES (59, 59, 'multiple_choice', 1, ?, 10)`,
+		`{
+			"prompt": "Kata 'APEL' diawali dengan huruf vokal apa? 🍎",
+			"options": ["A 🅰️", "I ℹ️", "U 🇺"],
+			"answer": "A 🅰️",
+			"hint": "Bunyikan kata A-A-Apel!",
+			"explanation": "Hebat! Apel diawali dengan huruf A."
+		}`,
+	)
+
+	_, _ = db.Exec(
+		`INSERT OR IGNORE INTO lessons (id, category_id, age_group, level, sort_order, title, description, content_json, estimated_minutes, xp_reward)
+		 VALUES (60, ?, 'explorers', 2, 1, 'Mengeja Kata Hewan 🐶', 'Mengeja nama-nama hewan sederhana', 
+		 '{"intro_text":"Ayo mengeja nama teman-teman hewan kita yang lucu! 🐈","icon":"🐶"}', 5, 10)`,
+		languageID,
+	)
+	_, _ = db.Exec(
+		`INSERT OR IGNORE INTO activities (id, lesson_id, type, sort_order, question_json, max_score)
+		 VALUES (60, 60, 'multiple_choice', 1, ?, 10)`,
+		`{
+			"prompt": "Bagaimana ejaan yang benar untuk nama hewan ini: 🐈?",
+			"options": ["K-U-C-I-N-G", "K-U-J-I-N-G", "K-U-S-I-N-G"],
+			"answer": "K-U-C-I-N-G",
+			"hint": "Huruf tengahnya adalah C seperti Cacing!",
+			"explanation": "Pintar! Ejaannya adalah K-U-C-I-N-G (Kucing)."
+		}`,
+	)
+
+	_, _ = db.Exec(
+		`INSERT OR IGNORE INTO lessons (id, category_id, age_group, level, sort_order, title, description, content_json, estimated_minutes, xp_reward)
+		 VALUES (61, ?, 'explorers', 3, 1, 'Mencocokkan Kata Benda 🚗', 'Menghubungkan gambar dengan kata benda yang tepat', 
+		 '{"intro_text":"Lihat benda di sekitarmu dan sebutkan namanya! 🧸","icon":"🚗"}', 5, 10)`,
+		languageID,
+	)
+	_, _ = db.Exec(
+		`INSERT OR IGNORE INTO activities (id, lesson_id, type, sort_order, question_json, max_score)
+		 VALUES (61, 61, 'multiple_choice', 1, ?, 10)`,
+		`{
+			"prompt": "Kendaraan roda empat yang berbunyi 'Brumm' disebut?",
+			"options": ["Mobil 🚗", "Sepeda 🚲", "Kereta 🚂"],
+			"answer": "Mobil 🚗",
+			"hint": "Mobil memiliki pintu dan roda empat!",
+			"explanation": "Luar biasa! Itu adalah Mobil."
+		}`,
+	)
+
+	// --- Explorers Logic ---
+	_, _ = db.Exec(
+		`INSERT OR IGNORE INTO lessons (id, category_id, age_group, level, sort_order, title, description, content_json, estimated_minutes, xp_reward)
+		 VALUES (62, ?, 'explorers', 1, 1, 'Mencari Gambar Berbeda 🔎', 'Melatih ketelitian dengan mencari benda yang berbeda', 
+		 '{"intro_text":"Amati gambar-gambar berikut dengan sangat teliti! Ada satu yang berbeda.","icon":"🔎"}', 5, 10)`,
+		logicID,
+	)
+	_, _ = db.Exec(
+		`INSERT OR IGNORE INTO activities (id, lesson_id, type, sort_order, question_json, max_score)
+		 VALUES (62, 62, 'multiple_choice', 1, ?, 10)`,
+		`{
+			"prompt": "Manakah gambar yang paling BERBEDA di antara pilihan berikut?",
+			"options": ["Pisang 🍌 (Buah)", "Apel 🍎 (Buah)", "Mobil 🚗 (Kendaraan)"],
+			"answer": "Mobil 🚗 (Kendaraan)",
+			"hint": "Dua pilihan adalah buah yang bisa dimakan, satu adalah kendaraan!",
+			"explanation": "Hebat! Mobil bukan buah, jadi ia berbeda."
+		}`,
+	)
+
+	_, _ = db.Exec(
+		`INSERT OR IGNORE INTO lessons (id, category_id, age_group, level, sort_order, title, description, content_json, estimated_minutes, xp_reward)
+		 VALUES (63, ?, 'explorers', 2, 1, 'Mengingat Kartu Hewan 🃏', 'Permainan mencocokkan ingatan visual', 
+		 '{"intro_text":"Gunakan ingatanmu untuk mencocokkan sepasang hewan yang sama! 🐵","icon":"🃏"}', 5, 10)`,
+		logicID,
+	)
+	_, _ = db.Exec(
+		`INSERT OR IGNORE INTO activities (id, lesson_id, type, sort_order, question_json, max_score)
+		 VALUES (63, 63, 'multiple_choice', 1, ?, 10)`,
+		`{
+			"prompt": "Jika kartu pertama adalah Kucing 🐱, pasangannya yang tepat adalah kartu bergambar apa?",
+			"options": ["Kucing 🐱", "Anjing 🐶", "Kelinci 🐰"],
+			"answer": "Kucing 🐱",
+			"hint": "Cari hewan yang sama persis bentuk dan suaranya!",
+			"explanation": "Tepat sekali! Pasangan Kucing adalah Kucing 🐱."
+		}`,
+	)
+
+	_, _ = db.Exec(
+		`INSERT OR IGNORE INTO lessons (id, category_id, age_group, level, sort_order, title, description, content_json, estimated_minutes, xp_reward)
+		 VALUES (64, ?, 'explorers', 3, 1, 'Labirin Keju Tikus 🧀', 'Menemukan rute sederhana untuk tikus kecil', 
+		 '{"intro_text":"Bantu tikus kecil menemukan jalannya menuju keju lezat! 🐭","icon":"🧀"}', 5, 10)`,
+		logicID,
+	)
+	_, _ = db.Exec(
+		`INSERT OR IGNORE INTO activities (id, lesson_id, type, sort_order, question_json, max_score)
+		 VALUES (64, 64, 'multiple_choice', 1, ?, 10)`,
+		`{
+			"prompt": "Jalan ke atas tertutup dinding 🧱, jalan ke kanan terbuka bebas 🟢. Ke mana tikus harus berjalan?",
+			"options": ["Ke Kanan ➡️", "Ke Atas ⬆️", "Kembali ke Belakang ⬅️"],
+			"answer": "Ke Kanan ➡️",
+			"hint": "Pilihlah jalan yang tidak tertutup dinding!",
+			"explanation": "Benar! Jalan ke kanan aman dan terbuka."
+		}`,
+	)
+
+	// --- Explorers Art ---
+	_, _ = db.Exec(
+		`INSERT OR IGNORE INTO lessons (id, category_id, age_group, level, sort_order, title, description, content_json, estimated_minutes, xp_reward)
+		 VALUES (65, ?, 'explorers', 1, 1, 'Mewarnai Bebas 🎨', 'Melukis dan mewarnai di kanvas dengan kuas', 
+		 '{"intro_text":"Gunakan kuas warnamu untuk membuat lukisan yang indah! 🖌️","icon":"🎨"}', 5, 10)`,
+		artID,
+	)
+	_, _ = db.Exec(
+		`INSERT OR IGNORE INTO activities (id, lesson_id, type, sort_order, question_json, max_score)
+		 VALUES (65, 65, 'drawing', 1, ?, 10)`,
+		`{
+			"prompt": "Gambarlah pemandangan atau bunga kesukaanmu! 🎨",
+			"hint": "Gunakan stempel stiker matahari ☀️ atau pelangi 🌈 agar lebih indah!",
+			"explanation": "Sangat bagus sekali gambarmu! Sungguh indah."
+		}`,
+	)
+
+	_, _ = db.Exec(
+		`INSERT OR IGNORE INTO lessons (id, category_id, age_group, level, sort_order, title, description, content_json, estimated_minutes, xp_reward)
+		 VALUES (66, ?, 'explorers', 2, 1, 'Membuat Pola Warna-Warni 🌈', 'Mengenal keindahan susunan warna pelangi', 
+		 '{"intro_text":"Pelangi memiliki susunan warna yang indah. Mari susun bersama! 🌈","icon":"🌈"}', 5, 10)`,
+		artID,
+	)
+	_, _ = db.Exec(
+		`INSERT OR IGNORE INTO activities (id, lesson_id, type, sort_order, question_json, max_score)
+		 VALUES (66, 66, 'multiple_choice', 1, ?, 10)`,
+		`{
+			"prompt": "Warna pertama pada pelangi yang indah adalah?",
+			"options": ["Merah 🔴", "Hijau 🟢", "Biru 🔵"],
+			"answer": "Merah 🔴",
+			"hint": "Ingat lagu: 'Me-Ji-Ku-Hi-Bi-Ni-Yu'!",
+			"explanation": "Benar! Merah adalah warna teratas pelangi."
+		}`,
+	)
+
+	_, _ = db.Exec(
+		`INSERT OR IGNORE INTO lessons (id, category_id, age_group, level, sort_order, title, description, content_json, estimated_minutes, xp_reward)
+		 VALUES (67, ?, 'explorers', 3, 1, 'Mencampur Warna Dasar 🧪', 'Belajar hasil pencampuran warna primer', 
+		 '{"intro_text":"Jika dua warna dicampur, akan lahir warna baru yang ajaib! 🎨","icon":"🧪"}', 5, 10)`,
+		artID,
+	)
+	_, _ = db.Exec(
+		`INSERT OR IGNORE INTO activities (id, lesson_id, type, sort_order, question_json, max_score)
+		 VALUES (67, 67, 'multiple_choice', 1, ?, 10)`,
+		`{
+			"prompt": "Jika warna Biru 🔵 dicampur dengan Kuning 🟡, warna apa yang akan terbentuk?",
+			"options": ["Hijau 🟩", "Oranye 🟧", "Ungu 🟪"],
+			"answer": "Hijau 🟩",
+			"hint": "Pikirkan warna daun pohon!",
+			"explanation": "Campuran Biru and Kuning menghasilkan warna Hijau 🟩."
+		}`,
+	)
+
+	// --- Challengers Math ---
+	_, _ = db.Exec(
+		`INSERT OR IGNORE INTO lessons (id, category_id, age_group, level, sort_order, title, description, content_json, estimated_minutes, xp_reward)
+		 VALUES (80, ?, 'challengers', 1, 1, 'Penjumlahan & Pengurangan Besar 🧮', 'Latihan berhitung angka ratusan dan ribuan secara cepat', 
+		 '{"intro_text":"Selamat datang penantang hebat! Mari mengasah kemampuan berhitung angka besar!","icon":"🧮"}', 10, 20)`,
+		mathID,
+	)
+	_, _ = db.Exec(
+		`INSERT OR IGNORE INTO activities (id, lesson_id, type, sort_order, question_json, max_score)
+		 VALUES (80, 80, 'fill_blank', 1, ?, 10)`,
+		`{
+			"prompt": "Berapakah hasil dari 1450 + 2350? Ketik jawabanmu!",
+			"answer": "3800",
+			"hint": "Gunakan penjumlahan susun: 1400 + 2300 = 3700, lalu tambahkan 50 + 50 = 100!",
+			"explanation": "Benar! 1450 + 2350 = 3800."
+		}`,
+	)
+
+	_, _ = db.Exec(
+		`INSERT OR IGNORE INTO lessons (id, category_id, age_group, level, sort_order, title, description, content_json, estimated_minutes, xp_reward)
+		 VALUES (81, ?, 'challengers', 2, 1, 'Perkalian & Pembagian Cepat ⚡', 'Perkalian dua digit dan pembagian bersusun', 
+		 '{"intro_text":"Perkalian cepat adalah teknik melatih konsentrasi dan pemecahan masalah numerik.","icon":"⚡"}', 10, 20)`,
+		mathID,
+	)
+	_, _ = db.Exec(
+		`INSERT OR IGNORE INTO activities (id, lesson_id, type, sort_order, question_json, max_score)
+		 VALUES (81, 81, 'multiple_choice', 1, ?, 10)`,
+		`{
+			"prompt": "Berapakah hasil dari 25 × 12?",
+			"options": ["300", "280", "320", "250"],
+			"answer": "300",
+			"hint": "25 × 10 = 250. Tambahkan dengan 25 × 2 = 50!",
+			"explanation": "Tepat! 25 × 12 = 250 + 50 = 300."
+		}`,
+	)
+
+	_, _ = db.Exec(
+		`INSERT OR IGNORE INTO lessons (id, category_id, age_group, level, sort_order, title, description, content_json, estimated_minutes, xp_reward)
+		 VALUES (82, ?, 'challengers', 3, 1, 'Mengenal Pecahan & Desimal 🍰', 'Belajar konsep bagian dari keseluruhan dan desimal', 
+		 '{"intro_text":"Pecahan membantu kita membagi kue atau pizza sama rata dengan teman! 🍕","icon":"🍰"}', 10, 20)`,
+		mathID,
+	)
+	_, _ = db.Exec(
+		`INSERT OR IGNORE INTO activities (id, lesson_id, type, sort_order, question_json, max_score)
+		 VALUES (82, 82, 'multiple_choice', 1, ?, 10)`,
+		`{
+			"prompt": "Manakah bentuk desimal dari pecahan 3/4?",
+			"options": ["0.75", "0.50", "0.34", "0.80"],
+			"answer": "0.75",
+			"hint": "Pikirkan 3 perempat bagian dari 100!",
+			"explanation": "Benar! 3/4 sama dengan 75/100, yaitu 0.75."
+		}`,
+	)
+
+	// --- Challengers Science ---
+	_, _ = db.Exec(
+		`INSERT OR IGNORE INTO lessons (id, category_id, age_group, level, sort_order, title, description, content_json, estimated_minutes, xp_reward)
+		 VALUES (83, ?, 'challengers', 1, 1, 'Sistem Organ Manusia 🫁', 'Mengenal organ tubuh pernapasan dan pencernaan', 
+		 '{"intro_text":"Di dalam tubuh kita, organ bekerja sama tanpa henti untuk menjaga kita tetap hidup!","icon":"🫁"}', 10, 20)`,
+		scienceID,
+	)
+	_, _ = db.Exec(
+		`INSERT OR IGNORE INTO activities (id, lesson_id, type, sort_order, question_json, max_score)
+		 VALUES (83, 83, 'multiple_choice', 1, ?, 10)`,
+		`{
+			"prompt": "Organ tubuh manakah yang berfungsi memompa darah ke seluruh tubuh kita? 🩸",
+			"options": ["Jantung ❤️", "Paru-paru 🫁", "Lambung 🥣"],
+			"answer": "Jantung ❤️",
+			"hint": "Organ ini berdetak di sebelah kiri rongga dada kita!",
+			"explanation": "Tepat sekali! Jantung memompa darah kaya oksigen ke seluruh tubuh."
+		}`,
+	)
+
+	_, _ = db.Exec(
+		`INSERT OR IGNORE INTO lessons (id, category_id, age_group, level, sort_order, title, description, content_json, estimated_minutes, xp_reward)
+		 VALUES (84, ?, 'challengers', 2, 1, 'Rantai Makanan & Ekosistem 🌾', 'Mengenal produsen, konsumen, dan pengurai di alam', 
+		 '{"intro_text":"Semua makhluk hidup saling bergantung untuk makanan. Urutan makan-memakan ini disebut rantai makanan!","icon":"🌾"}', 10, 20)`,
+		scienceID,
+	)
+	_, _ = db.Exec(
+		`INSERT OR IGNORE INTO activities (id, lesson_id, type, sort_order, question_json, max_score)
+		 VALUES (84, 84, 'sequencing', 1, ?, 10)`,
+		`{
+			"prompt": "Urutkan rantai makanan di sawah dari produsen hingga konsumen puncak!",
+			"items": ["Ular 🐍", "Padi 🌾", "Belalang 🦗", "Katak 🐸"],
+			"expected_order": ["Padi 🌾", "Belalang 🦗", "Katak 🐸", "Ular 🐍"],
+			"hint": "Mulai dari padi sebagai tumbuhan hijau (produsen)!",
+			"explanation": "Sempurna! Padi dimakan belalang, belalang dimakan katak, katak dimakan ular."
+		}`,
+	)
+
+	_, _ = db.Exec(
+		`INSERT OR IGNORE INTO lessons (id, category_id, age_group, level, sort_order, title, description, content_json, estimated_minutes, xp_reward)
+		 VALUES (85, ?, 'challengers', 3, 1, 'Rangkaian Listrik Logika 🔌', 'Mengenal rangkaian seri, paralel, dan penghantar listrik', 
+		 '{"intro_text":"Arus listrik mengalir dalam jalur tertutup. Jalur ini disebut rangkaian listrik!","icon":"🔌"}', 10, 20)`,
+		scienceID,
+	)
+	_, _ = db.Exec(
+		`INSERT OR IGNORE INTO activities (id, lesson_id, type, sort_order, question_json, max_score)
+		 VALUES (85, 85, 'multiple_choice', 1, ?, 10)`,
+		`{
+			"prompt": "Jika salah satu lampu pada rangkaian listrik padam dan semua lampu lain ikut padam, rangkaian tersebut adalah rangkaian?",
+			"options": ["Seri 🔗", "Paralel 🔀", "Campuran 🔄"],
+			"answer": "Seri 🔗",
+			"hint": "Semua komponen dihubungkan berurutan dalam satu jalur aliran tunggal.",
+			"explanation": "Benar! Pada rangkaian seri, aliran listrik hanya satu jalur sehingga jika terputus semua mati."
+		}`,
+	)
+
+	// --- Challengers Coding ---
+	_, _ = db.Exec(
+		`INSERT OR IGNORE INTO lessons (id, category_id, age_group, level, sort_order, title, description, content_json, estimated_minutes, xp_reward)
+		 VALUES (86, ?, 'challengers', 1, 1, 'Variabel & Menyimpan Data 📦', 'Memahami konsep variabel sebagai kotak penyimpanan informasi', 
+		 '{"intro_text":"Variabel digunakan oleh komputer untuk menyimpan angka atau teks dengan nama tertentu!","icon":"📦"}', 10, 20)`,
+		codingID,
+	)
+	_, _ = db.Exec(
+		`INSERT OR IGNORE INTO activities (id, lesson_id, type, sort_order, question_json, max_score)
+		 VALUES (86, 86, 'multiple_choice', 1, ?, 10)`,
+		`{
+			"prompt": "Jika kita menulis kode: skor = 10 dan kemudian skor = skor + 5, berapa isi variabel skor sekarang?",
+			"options": ["15", "10", "5", "skor5"],
+			"answer": "15",
+			"hint": "Ambil nilai awal (10) lalu tambahkan dengan 5!",
+			"explanation": "Hebat! Variabel menyimpan nilai baru: 10 + 5 = 15."
+		}`,
+	)
+
+	_, _ = db.Exec(
+		`INSERT OR IGNORE INTO lessons (id, category_id, age_group, level, sort_order, title, description, content_json, estimated_minutes, xp_reward)
+		 VALUES (87, ?, 'challengers', 2, 1, 'Logika Kondisi Bercabang 🔀', 'Menyusun keputusan rumit menggunakan If - Else', 
+		 '{"intro_text":"Komputer menggunakan logika If-Else bercabang untuk menangani kondisi yang kompleks!","icon":"🔀"}', 10, 20)`,
+		codingID,
+	)
+	_, _ = db.Exec(
+		`INSERT OR IGNORE INTO activities (id, lesson_id, type, sort_order, question_json, max_score)
+		 VALUES (87, 87, 'block_code', 1, ?, 10)`,
+		`{
+			"prompt": "Susun blok kode: Jika Nilai >= 70 -> Tampilkan 'Lulus' -> Jika Tidak -> Tampilkan 'Ulangi'!",
+			"available_blocks": ["Jika Nilai >= 70 🎓", "Tampilkan 'Lulus' ✅", "Jika Tidak ❌", "Tampilkan 'Ulangi' 🔄"],
+			"expected_order": ["Jika Nilai >= 70 🎓", "Tampilkan 'Lulus' ✅", "Jika Tidak ❌", "Tampilkan 'Ulangi' 🔄"],
+			"hint": "Susun sesuai urutan kondisi, tindakan benar, jika tidak, dan tindakan salah!",
+			"explanation": "Sempurna! Logika kondisi bercabang berhasil disusun dengan tepat."
+		}`,
+	)
+
+	_, _ = db.Exec(
+		`INSERT OR IGNORE INTO lessons (id, category_id, age_group, level, sort_order, title, description, content_json, estimated_minutes, xp_reward)
+		 VALUES (88, ?, 'challengers', 3, 1, 'Nested Loop (Loop Bersarang) 🔄', 'Mengenal konsep perulangan di dalam perulangan', 
+		 '{"intro_text":"Nested Loop terjadi ketika ada loop di dalam loop lain. Berguna membuat pola baris-kolom!","icon":"🔄"}', 10, 20)`,
+		codingID,
+	)
+	_, _ = db.Exec(
+		`INSERT OR IGNORE INTO activities (id, lesson_id, type, sort_order, question_json, max_score)
+		 VALUES (88, 88, 'multiple_choice', 1, ?, 10)`,
+		`{
+			"prompt": "Jika Loop Luar berjalan 3 kali, dan di dalamnya ada Loop Dalam yang berjalan 2 kali, berapa total tindakan yang dieksekusi?",
+			"options": ["6 kali", "5 kali", "3 kali", "2 kali"],
+			"answer": "6 kali",
+			"hint": "Kalikan jumlah perulangan luar dengan perulangan dalam (3 × 2)!",
+			"explanation": "Hebat! Loop dalam berjalan 2 kali untuk setiap langkah loop luar, totalnya 3 × 2 = 6 kali."
+		}`,
+	)
+
+	// --- Challengers Language ---
+	_, _ = db.Exec(
+		`INSERT OR IGNORE INTO lessons (id, category_id, age_group, level, sort_order, title, description, content_json, estimated_minutes, xp_reward)
+		 VALUES (89, ?, 'challengers', 1, 1, 'Kosakata Bahasa Indonesia 📚', 'Mengenal sinonim, antonim, dan padanan kata tingkat lanjut', 
+		 '{"intro_text":"Mari perbanyak kosakata Bahasa Indonesiamu agar menulis dan membaca semakin asyik!","icon":"📚"}', 10, 20)`,
+		languageID,
+	)
+	_, _ = db.Exec(
+		`INSERT OR IGNORE INTO activities (id, lesson_id, type, sort_order, question_json, max_score)
+		 VALUES (89, 89, 'multiple_choice', 1, ?, 10)`,
+		`{
+			"prompt": "Manakah padanan kata (sinonim) yang paling tepat untuk kata 'EVALUASI'?",
+			"options": ["Penilaian", "Permulaan", "Peralatan", "Penyebaran"],
+			"answer": "Penilaian",
+			"hint": "Mengevaluasi pekerjaan berarti memberikan nilai pada hasil kerja.",
+			"explanation": "Benar! Sinonim evaluasi adalah penilaian atau penaksiran."
+		}`,
+	)
+
+	_, _ = db.Exec(
+		`INSERT OR IGNORE INTO lessons (id, category_id, age_group, level, sort_order, title, description, content_json, estimated_minutes, xp_reward)
+		 VALUES (90, ?, 'challengers', 2, 1, 'Menyusun Kalimat Efektif ✍️', 'Menyusun kata acak menjadi kalimat sesuai kaidah SPOK', 
+		 '{"intro_text":"Kalimat efektif mempermudah orang lain memahami maksud tulisan kita!","icon":"✍️"}', 10, 20)`,
+		languageID,
+	)
+	_, _ = db.Exec(
+		`INSERT OR IGNORE INTO activities (id, lesson_id, type, sort_order, question_json, max_score)
+		 VALUES (90, 90, 'sequencing', 1, ?, 10)`,
+		`{
+			"prompt": "Susun kalimat berikut agar mengikuti kaidah Subjek, Predikat, Objek, Keterangan (SPOK)!",
+			"items": ["di perpustakaan", "membaca", "Siti", "buku cerita"],
+			"expected_order": ["Siti", "membaca", "buku cerita", "di perpustakaan"],
+			"hint": "Mulai dengan pelaku/nama orang (Subjek) diikuti kata kerja (Predikat)!",
+			"explanation": "Bagus sekali! Kalimat efektif: Siti (S) membaca (P) buku cerita (O) di perpustakaan (K)."
+		}`,
+	)
+
+	_, _ = db.Exec(
+		`INSERT OR IGNORE INTO lessons (id, category_id, age_group, level, sort_order, title, description, content_json, estimated_minutes, xp_reward)
+		 VALUES (91, ?, 'challengers', 3, 1, 'Pemahaman Bacaan Kritis 📖', 'Membaca teks panjang dan menarik kesimpulan kritis', 
+		 '{"intro_text":"Bacalah paragraf pendek di bawah dan tentukan ide pokok ceritanya!","icon":"📖"}', 10, 20)`,
+		languageID,
+	)
+	_, _ = db.Exec(
+		`INSERT OR IGNORE INTO activities (id, lesson_id, type, sort_order, question_json, max_score)
+		 VALUES (91, 91, 'multiple_choice', 1, ?, 10)`,
+		`{
+			"prompt": "Paragraf: 'Hutan bakau memiliki peran penting bagi ekosistem pantai. Akar bakau mencegah abrasi tanah oleh ombak laut. Selain itu, hutan bakau menjadi rumah bagi kepiting dan ikan kecil.' Apakah ide pokok paragraf tersebut?",
+			"options": ["Manfaat hutan bakau bagi pantai 🌊", "Cara kepiting mencari makan 🦀", "Proses terjadinya ombak laut 🌊"],
+			"answer": "Manfaat hutan bakau bagi pantai 🌊",
+			"hint": "Perhatikan kalimat pertama dan kalimat pendukung setelahnya!",
+			"explanation": "Benar! Seluruh paragraf membahas peran penting (manfaat) hutan bakau."
+		}`,
+	)
+
+	// --- Challengers Logic ---
+	_, _ = db.Exec(
+		`INSERT OR IGNORE INTO lessons (id, category_id, age_group, level, sort_order, title, description, content_json, estimated_minutes, xp_reward)
+		 VALUES (92, ?, 'challengers', 1, 1, 'Teka-teki Pola Deret 🔢', 'Menemukan pola angka deret matematika logika', 
+		 '{"intro_text":"Teka-teki deret angka melatih otak menemukan hubungan logis antar elemen!","icon":"🔢"}', 10, 20)`,
+		logicID,
+	)
+	_, _ = db.Exec(
+		`INSERT OR IGNORE INTO activities (id, lesson_id, type, sort_order, question_json, max_score)
+		 VALUES (92, 92, 'fill_blank', 1, ?, 10)`,
+		`{
+			"prompt": "Lengkapi angka berikutnya dari deret ini: 1, 3, 6, 10, 15, __ ?",
+			"answer": "21",
+			"hint": "Selisih angkanya bertambah: +2, +3, +4, +5... Langkah berikutnya adalah +6!",
+			"explanation": "Tepat! 15 + 6 = 21. Pola pertambahan berurutan."
+		}`,
+	)
+
+	_, _ = db.Exec(
+		`INSERT OR IGNORE INTO lessons (id, category_id, age_group, level, sort_order, title, description, content_json, estimated_minutes, xp_reward)
+		 VALUES (93, ?, 'challengers', 2, 1, 'Logika Sudoku Grid 🧩', 'Memahami aturan peletakan angka tanpa duplikasi', 
+		 '{"intro_text":"Sudoku adalah teka-teki penempatan angka berdasarkan baris, kolom, dan kotak tanpa duplikat!","icon":"🧩"}', 10, 20)`,
+		logicID,
+	)
+	_, _ = db.Exec(
+		`INSERT OR IGNORE INTO activities (id, lesson_id, type, sort_order, question_json, max_score)
+		 VALUES (93, 93, 'multiple_choice', 1, ?, 10)`,
+		`{
+			"prompt": "Pada baris Sudoku 4x4: [1, 2, 4, __ ]. Angka berapakah yang harus mengisi tempat kosong?",
+			"options": ["3", "4", "5", "1"],
+			"answer": "3",
+			"hint": "Gunakan angka 1 sampai 4. Angka mana yang belum ada di baris tersebut?",
+			"explanation": "Benar! Angka 3 melengkapi baris agar berisi angka 1-4 tanpa berulang."
+		}`,
+	)
+
+	_, _ = db.Exec(
+		`INSERT OR IGNORE INTO lessons (id, category_id, age_group, level, sort_order, title, description, content_json, estimated_minutes, xp_reward)
+		 VALUES (94, ?, 'challengers', 3, 1, 'Kriptografi Caesar Cipher 🔑', 'Belajar menyandikan dan memecahkan pesan rahasia', 
+		 '{"intro_text":"Caesar Cipher adalah metode sandi geser tertua. Setiap huruf digeser beberapa langkah!","icon":"🔑"}', 10, 20)`,
+		logicID,
+	)
+	_, _ = db.Exec(
+		`INSERT OR IGNORE INTO activities (id, lesson_id, type, sort_order, question_json, max_score)
+		 VALUES (94, 94, 'fill_blank', 1, ?, 10)`,
+		`{
+			"prompt": "Jika kunci geser adalah +1 (A menjadi B, B menjadi C), pecahkan pesan rahasia berikut: 'BUB'!",
+			"answer": "CVC",
+			"hint": "Ganti huruf B dengan C, U dengan V, dan B dengan C!",
+			"explanation": "Hebat! Pesan rahasianya adalah CVC (B+1=C, U+1=V, B+1=C)."
+		}`,
+	)
+
+	// --- Challengers Art ---
+	_, _ = db.Exec(
+		`INSERT OR IGNORE INTO lessons (id, category_id, age_group, level, sort_order, title, description, content_json, estimated_minutes, xp_reward)
+		 VALUES (95, ?, 'challengers', 1, 1, 'Roda Warna Lanjutan 🌈', 'Mengenal harmoni warna analog, monokrom, dan komplementer', 
+		 '{"intro_text":"Seni digital yang baik menggunakan skema harmoni warna agar enak dipandang!","icon":"🌈"}', 10, 20)`,
+		artID,
+	)
+	_, _ = db.Exec(
+		`INSERT OR IGNORE INTO activities (id, lesson_id, type, sort_order, question_json, max_score)
+		 VALUES (95, 95, 'multiple_choice', 1, ?, 10)`,
+		`{
+			"prompt": "Skema warna yang menggunakan tingkat kecerahan berbeda dari satu warna tunggal disebut?",
+			"options": ["Monokromatik", "Komplementer", "Analog"],
+			"answer": "Monokromatik",
+			"hint": "Mono berarti satu, kromatik berarti warna.",
+			"explanation": "Benar! Monokromatik menggunakan variasi terang-gelap dari satu warna dasar."
+		}`,
+	)
+
+	_, _ = db.Exec(
+		`INSERT OR IGNORE INTO lessons (id, category_id, age_group, level, sort_order, title, description, content_json, estimated_minutes, xp_reward)
+		 VALUES (96, ?, 'challengers', 2, 1, 'Seni Pixel Grid 12x12 👾', 'Membuat lukisan pixel art berukuran 12x12', 
+		 '{"intro_text":"Seni pixel 12x12 memberimu ruang lebih besar untuk detail gambar yang keren!","icon":"👾"}', 10, 20)`,
+		artID,
+	)
+	_, _ = db.Exec(
+		`INSERT OR IGNORE INTO activities (id, lesson_id, type, sort_order, question_json, max_score)
+		 VALUES (96, 96, 'pixel_art', 1, ?, 10)`,
+		`{
+			"prompt": "Buatlah karakter pixel art favoritmu dalam grid 12x12! 👾",
+			"hint": "Gunakan palet warna retro untuk mewarnai grid!",
+			"explanation": "Karya seni pixel 12x12 buatanmu sungguh menakjubkan!"
+		}`,
+	)
+
+	_, _ = db.Exec(
+		`INSERT OR IGNORE INTO lessons (id, category_id, age_group, level, sort_order, title, description, content_json, estimated_minutes, xp_reward)
+		 VALUES (97, ?, 'challengers', 3, 1, 'Digital Canvas Master 🎨', 'Menggambar sketsa kreatif dengan kombinasi kuas dan stempel', 
+		 '{"intro_text":"Kanvas digital adalah tempat bebas berekspresi. Mari buktikan kreativitasmu!","icon":"🎨"}', 10, 20)`,
+		artID,
+	)
+	_, _ = db.Exec(
+		`INSERT OR IGNORE INTO activities (id, lesson_id, type, sort_order, question_json, max_score)
+		 VALUES (97, 97, 'drawing', 1, ?, 10)`,
+		`{
+			"prompt": "Lukislah poster bertema alam atau luar angkasa impianmu! 🚀🌲",
+			"hint": "Gunakan kuas tebal untuk latar belakang dan kuas tipis untuk detail!",
+			"explanation": "Luar biasa! Poster buatanmu siap dipajang!"
+		}`,
+	)
+
+	fmt.Println("Seeded Math, Coding, Toddler, Science, Language, Logic, Art, Explorers, and Challengers content")
 	return nil
 }

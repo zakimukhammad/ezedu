@@ -95,6 +95,15 @@ export const childrenApi = {
 
   getRemainingTime: (id: number) =>
     request(`/children/${id}/remaining-time`),
+
+  getDifficulty: (id: number) =>
+    request(`/children/${id}/difficulty`),
+
+  acceptDifficulty: (childId: number, categoryId: number) =>
+    request(`/children/${childId}/difficulty/${categoryId}/accept`, { method: 'POST' }),
+
+  dismissDifficulty: (childId: number, categoryId: number) =>
+    request(`/children/${childId}/difficulty/${categoryId}/dismiss`, { method: 'POST' }),
 };
 
 // Categories API

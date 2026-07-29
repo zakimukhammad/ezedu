@@ -160,6 +160,19 @@ func Migrate(db *sql.DB) error {
 			UNIQUE(child_id, challenge_id)
 		)`,
 
+		`CREATE TABLE IF NOT EXISTS difficulty_adjustments (
+			id INTEGER PRIMARY KEY AUTOINCREMENT,
+			child_id INTEGER NOT NULL REFERENCES children(id) ON DELETE CASCADE,
+			category_id INTEGER NOT NULL REFERENCES categories(id),
+			current_level INTEGER NOT NULL DEFAULT 1 CHECK(current_level BETWEEN 1 AND 5),
+			recommended_level INTEGER,
+			recommendation TEXT DEFAULT '' CHECK(recommendation IN ('', 'easier', 'harder')),
+			consecutive_low INTEGER DEFAULT 0,
+			consecutive_high INTEGER DEFAULT 0,
+			last_evaluated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+			UNIQUE(child_id, category_id)
+		)`,
+
 		// Indexes
 		`CREATE INDEX IF NOT EXISTS idx_children_account ON children(account_id)`,
 		`CREATE INDEX IF NOT EXISTS idx_lessons_category_age ON lessons(category_id, age_group, level)`,
@@ -167,6 +180,7 @@ func Migrate(db *sql.DB) error {
 		`CREATE INDEX IF NOT EXISTS idx_results_child ON activity_results(child_id, activity_id)`,
 		`CREATE INDEX IF NOT EXISTS idx_badges_child ON child_badges(child_id)`,
 		`CREATE INDEX IF NOT EXISTS idx_sessions_expires ON sessions(expires_at)`,
+		`CREATE INDEX IF NOT EXISTS idx_difficulty_child_cat ON difficulty_adjustments(child_id, category_id)`,
 	}
 
 	for i, m := range migrations {

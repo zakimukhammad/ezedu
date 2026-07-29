@@ -7,6 +7,8 @@ import (
 	"strings"
 
 	"github.com/ezedu/backend/internal/auth"
+	"github.com/ezedu/backend/internal/engine"
+	"github.com/ezedu/backend/internal/model"
 	"github.com/ezedu/backend/internal/store"
 	"github.com/go-chi/chi/v5"
 )
@@ -18,6 +20,7 @@ type LessonHandler struct {
 	progress   *store.ProgressStore
 	children   *store.ChildStore
 	badges     *store.BadgeStore
+	adaptive   *engine.AdaptiveEngine
 }
 
 func NewLessonHandler(
@@ -26,6 +29,7 @@ func NewLessonHandler(
 	progress *store.ProgressStore,
 	children *store.ChildStore,
 	badges *store.BadgeStore,
+	adaptive *engine.AdaptiveEngine,
 ) *LessonHandler {
 	return &LessonHandler{
 		lessons:    lessons,
@@ -33,6 +37,7 @@ func NewLessonHandler(
 		progress:   progress,
 		children:   children,
 		badges:     badges,
+		adaptive:   adaptive,
 	}
 }
 
@@ -209,8 +214,23 @@ func (h *LessonHandler) SubmitActivity(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Record activity result if childID provided
+	var difficultyInfo interface{} = nil
 	if req.ChildID > 0 {
 		_ = h.progress.RecordActivityResult(req.ChildID, activityID, string(req.Answer), isCorrect, score, req.AttemptNo)
+
+		if h.adaptive != nil {
+			state, err := h.adaptive.EvaluateAfterActivity(req.ChildID, activityID, score, activity.MaxScore)
+			if err == nil && state != nil && state.Recommendation != "" {
+				difficultyInfo = map[string]interface{}{
+					"recommendation":    state.Recommendation,
+					"current_level":     state.CurrentLevel,
+					"recommended_level": state.RecommendedLevel,
+					"category_slug":     state.CategorySlug,
+					"category_name":     state.CategoryName,
+					"category_id":       state.CategoryID,
+				}
+			}
+		}
 	}
 
 	feedbackMsg := "Coba lagi! Kamu pasti bisa 💪"
@@ -225,6 +245,7 @@ func (h *LessonHandler) SubmitActivity(w http.ResponseWriter, r *http.Request) {
 		"feedback":    feedbackMsg,
 		"hint":        qData.Hint,
 		"explanation": qData.Explanation,
+		"difficulty":  difficultyInfo,
 	})
 }
 
@@ -297,12 +318,29 @@ func (h *LessonHandler) CompleteLesson(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
+	// Check difficulty recommendation for category
+	var difficultyRec interface{} = nil
+	if h.adaptive != nil && lesson != nil {
+		state, err := h.adaptive.GetCategoryDifficulty(req.ChildID, lesson.CategoryID)
+		if err == nil && state != nil && state.Recommendation != "" {
+			difficultyRec = map[string]interface{}{
+				"recommendation":    state.Recommendation,
+				"current_level":     state.CurrentLevel,
+				"recommended_level": state.RecommendedLevel,
+				"category_slug":     state.CategorySlug,
+				"category_name":     state.CategoryName,
+				"category_id":       state.CategoryID,
+			}
+		}
+	}
+
 	writeJSON(w, http.StatusOK, map[string]interface{}{
 		"message":        "Selamat! Kamu berhasil menyelesaikan pelajaran 🎉",
 		"xp_earned":      xpReward,
 		"level_up":       levelUp,
 		"new_level":      newLevel,
 		"badges_awarded": awardedBadges,
+		"difficulty":     difficultyRec,
 	})
 }
 
@@ -422,4 +460,114 @@ func normalizeString(s string) string {
 	}
 	return strings.TrimSpace(sb.String())
 }
+
+// GetChildDifficulty handles GET /api/children/{id}/difficulty
+func (h *LessonHandler) GetChildDifficulty(w http.ResponseWriter, r *http.Request) {
+	accountID := auth.AccountIDFromContext(r.Context())
+	childID, err := strconv.ParseInt(chi.URLParam(r, "id"), 10, 64)
+	if err != nil {
+		writeJSON(w, http.StatusBadRequest, map[string]string{"error": "ID anak tidak valid"})
+		return
+	}
+
+	child, err := h.children.GetByID(childID, accountID)
+	if err != nil || child == nil {
+		writeJSON(w, http.StatusNotFound, map[string]string{"error": "Profil anak tidak ditemukan"})
+		return
+	}
+
+	if h.adaptive == nil {
+		writeJSON(w, http.StatusOK, map[string]interface{}{"difficulties": []interface{}{}})
+		return
+	}
+
+	diffs, err := h.adaptive.GetDifficultyStates(childID)
+	if err != nil {
+		writeJSON(w, http.StatusInternalServerError, map[string]string{"error": "Gagal memuat status kesulitan"})
+		return
+	}
+
+	if diffs == nil {
+		diffs = []model.DifficultyAdjustment{}
+	}
+
+	writeJSON(w, http.StatusOK, map[string]interface{}{
+		"difficulties": diffs,
+	})
+}
+
+// AcceptDifficulty handles POST /api/children/{childId}/difficulty/{categoryId}/accept
+func (h *LessonHandler) AcceptDifficulty(w http.ResponseWriter, r *http.Request) {
+	accountID := auth.AccountIDFromContext(r.Context())
+	childID, err := strconv.ParseInt(chi.URLParam(r, "childId"), 10, 64)
+	if err != nil {
+		writeJSON(w, http.StatusBadRequest, map[string]string{"error": "ID anak tidak valid"})
+		return
+	}
+
+	categoryID, err := strconv.ParseInt(chi.URLParam(r, "categoryId"), 10, 64)
+	if err != nil {
+		writeJSON(w, http.StatusBadRequest, map[string]string{"error": "ID kategori tidak valid"})
+		return
+	}
+
+	child, err := h.children.GetByID(childID, accountID)
+	if err != nil || child == nil {
+		writeJSON(w, http.StatusNotFound, map[string]string{"error": "Profil anak tidak ditemukan"})
+		return
+	}
+
+	if h.adaptive == nil {
+		writeJSON(w, http.StatusBadRequest, map[string]string{"error": "Modul adaptif tidak tersedia"})
+		return
+	}
+
+	updated, err := h.adaptive.AcceptRecommendation(childID, categoryID)
+	if err != nil {
+		writeJSON(w, http.StatusBadRequest, map[string]string{"error": err.Error()})
+		return
+	}
+
+	writeJSON(w, http.StatusOK, map[string]interface{}{
+		"message":    "Tingkat kesulitan berhasil diperbarui! 🚀",
+		"difficulty": updated,
+	})
+}
+
+// DismissDifficulty handles POST /api/children/{childId}/difficulty/{categoryId}/dismiss
+func (h *LessonHandler) DismissDifficulty(w http.ResponseWriter, r *http.Request) {
+	accountID := auth.AccountIDFromContext(r.Context())
+	childID, err := strconv.ParseInt(chi.URLParam(r, "childId"), 10, 64)
+	if err != nil {
+		writeJSON(w, http.StatusBadRequest, map[string]string{"error": "ID anak tidak valid"})
+		return
+	}
+
+	categoryID, err := strconv.ParseInt(chi.URLParam(r, "categoryId"), 10, 64)
+	if err != nil {
+		writeJSON(w, http.StatusBadRequest, map[string]string{"error": "ID kategori tidak valid"})
+		return
+	}
+
+	child, err := h.children.GetByID(childID, accountID)
+	if err != nil || child == nil {
+		writeJSON(w, http.StatusNotFound, map[string]string{"error": "Profil anak tidak ditemukan"})
+		return
+	}
+
+	if h.adaptive == nil {
+		writeJSON(w, http.StatusBadRequest, map[string]string{"error": "Modul adaptif tidak tersedia"})
+		return
+	}
+
+	if err := h.adaptive.DismissRecommendation(childID, categoryID); err != nil {
+		writeJSON(w, http.StatusInternalServerError, map[string]string{"error": "Gagal mengabaikan rekomendasi"})
+		return
+	}
+
+	writeJSON(w, http.StatusOK, map[string]string{
+		"message": "Rekomendasi diabaikan",
+	})
+}
+
 

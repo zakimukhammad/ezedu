@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'preact/hooks';
-import { lessonsApi, activitiesApi } from '../lib/api';
+import { lessonsApi, activitiesApi, childrenApi } from '../lib/api';
 import { sounds } from '../lib/sound';
 import BlockCodingEngine from './BlockCodingEngine';
 import ToddlerEngine from './ToddlerEngine';
@@ -70,6 +70,7 @@ export default function QuizEngine({ lessonId }: Props) {
   const [leveledUp, setLeveledUp] = useState(false);
   const [newLevel, setNewLevel] = useState(1);
   const [showIntro, setShowIntro] = useState(true);
+  const [difficultyRec, setDifficultyRec] = useState<any>(null);
 
   const toggleSound = () => {
     const nextMuted = sounds.toggleMuted();
@@ -272,6 +273,10 @@ export default function QuizEngine({ lessonId }: Props) {
           setAwardedBadges(data.badges_awarded);
         }
 
+        if (data?.difficulty) {
+          setDifficultyRec(data.difficulty);
+        }
+
         const stored = sessionStorage.getItem('ezedu_child');
         if (stored) {
           const childData = JSON.parse(stored);
@@ -297,6 +302,23 @@ export default function QuizEngine({ lessonId }: Props) {
 
     sounds.playFanfare();
     setCompleted(true);
+  };
+
+  const handleAcceptDifficulty = async () => {
+    if (!child || !difficultyRec) return;
+    await childrenApi.acceptDifficulty(child.id, difficultyRec.category_id);
+    const catSlug = difficultyRec.category_slug || lesson?.category_slug;
+    if (catSlug) {
+      window.location.href = `/belajar/${catSlug}`;
+    } else {
+      window.location.href = '/beranda';
+    }
+  };
+
+  const handleDismissDifficulty = async () => {
+    if (!child || !difficultyRec) return;
+    await childrenApi.dismissDifficulty(child.id, difficultyRec.category_id);
+    setDifficultyRec(null);
   };
 
   if (loading) {
@@ -402,6 +424,49 @@ export default function QuizEngine({ lessonId }: Props) {
                   </div>
                 </div>
               ))}
+            </div>
+          </div>
+        )}
+
+        {/* Adaptive Difficulty Recommendation Banner */}
+        {difficultyRec && (
+          <div class={`quiz-difficulty-banner ${difficultyRec.recommendation} mt-xl animate-fade-in`}>
+            <div class="diff-header">
+              <span class="diff-icon">
+                {difficultyRec.recommendation === 'easier' ? '📉' : '🚀'}
+              </span>
+              <div>
+                <h4 class="diff-title">
+                  {difficultyRec.recommendation === 'easier'
+                    ? 'Rekomendasi Penyesuaian Level'
+                    : 'Siap Tantangan Baru!'}
+                </h4>
+                <p class="diff-desc">
+                  {difficultyRec.recommendation === 'easier'
+                    ? `Sepertinya materi ini cukup menantang. Coba pelajari Level ${difficultyRec.recommended_level} terlebih dahulu agar konsep dasar makin mantap!`
+                    : `Luar biasa! Kamu menyelesaikan soal dengan sangat baik. Yuk coba materi Level ${difficultyRec.recommended_level}!`}
+                </p>
+              </div>
+            </div>
+            <div class="diff-actions mt-md">
+              <button
+                type="button"
+                onClick={handleAcceptDifficulty}
+                class="btn btn-primary"
+                style="padding: 0.5rem 1rem; font-size: 0.9rem;"
+              >
+                {difficultyRec.recommendation === 'easier'
+                  ? `Pindah ke Level ${difficultyRec.recommended_level} 📉`
+                  : `Naik ke Level ${difficultyRec.recommended_level}! 🚀`}
+              </button>
+              <button
+                type="button"
+                onClick={handleDismissDifficulty}
+                class="btn-ghost"
+                style="padding: 0.5rem 1rem; font-size: 0.9rem;"
+              >
+                {difficultyRec.recommendation === 'easier' ? 'Tetap di Level Ini' : 'Nanti Saja'}
+              </button>
             </div>
           </div>
         )}

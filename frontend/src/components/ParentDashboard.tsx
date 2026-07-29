@@ -151,6 +151,24 @@ export default function ParentDashboard() {
   const [selectedIdx, setSelectedIdx] = useState(0);
   const [savingLimit, setSavingLimit] = useState(false);
   const [limitMsg, setLimitMsg] = useState('');
+  const [difficultiesMap, setDifficultiesMap] = useState<Record<number, any[]>>({});
+
+  const loadDifficulty = async (childId: number) => {
+    const res = await childrenApi.getDifficulty(childId);
+    if (res.data?.difficulties) {
+      setDifficultiesMap(prev => ({ ...prev, [childId]: res.data.difficulties }));
+    }
+  };
+
+  const handleAcceptDifficultyParent = async (childId: number, categoryId: number) => {
+    await childrenApi.acceptDifficulty(childId, categoryId);
+    loadDifficulty(childId);
+  };
+
+  const handleDismissDifficultyParent = async (childId: number, categoryId: number) => {
+    await childrenApi.dismissDifficulty(childId, categoryId);
+    loadDifficulty(childId);
+  };
 
   const handleSaveDailyLimit = async (childId: number, limitMin: number | null) => {
     setSavingLimit(true);
@@ -228,9 +246,14 @@ export default function ParentDashboard() {
     setLoading(false);
   };
 
-  // Render charts when data or selected child changes
+  // Render charts & fetch difficulty when data or selected child changes
   useEffect(() => {
     if (!pinVerified || loading || dashboards.length === 0) return;
+
+    const data = dashboards[selectedIdx];
+    if (data?.child?.id) {
+      loadDifficulty(data.child.id);
+    }
 
     const renderCharts = async () => {
       await loadChartJS();
@@ -679,6 +702,69 @@ export default function ParentDashboard() {
           </div>
 
           {limitMsg && <p class="pd-tl-msg">{limitMsg}</p>}
+        </div>
+
+        {/* Adaptive Difficulty Section */}
+        <div class="pd-time-limit-card">
+          <div class="pd-tl-header">
+            <div>
+              <h3>🧠 Tingkat Kesulitan Adaptif ({child.name})</h3>
+              <p>Sistem otomatis mengevaluasi hasil kuis dan merekomendasikan penyesuaian level jika anak kesulitan atau sangat mahir.</p>
+            </div>
+          </div>
+
+          <div class="pd-diff-grid">
+            {(difficultiesMap[child.id] || []).map((diff: any) => (
+              <div class={`pd-diff-card ${diff.recommendation ? 'has-rec' : ''}`} key={diff.category_id}>
+                <div class="pd-diff-header">
+                  <span class="pd-diff-cat">{diff.category_name || diff.category_slug}</span>
+                  <span class="pd-diff-level">Level {diff.current_level}</span>
+                </div>
+
+                {diff.recommendation ? (
+                  <div class="pd-diff-rec-box">
+                    <span class="pd-diff-rec-text">
+                      {diff.recommendation === 'easier'
+                        ? `📉 Disarankan turun ke Level ${diff.recommended_level}`
+                        : `🚀 Disarankan naik ke Level ${diff.recommended_level}`}
+                    </span>
+                    <div class="pd-diff-rec-btns">
+                      <button
+                        type="button"
+                        class="pd-tl-preset-btn active"
+                        onClick={() => handleAcceptDifficultyParent(child.id, diff.category_id)}
+                      >
+                        Terapkan
+                      </button>
+                      <button
+                        type="button"
+                        class="pd-tl-preset-btn"
+                        onClick={() => handleDismissDifficultyParent(child.id, diff.category_id)}
+                      >
+                        Abaikan
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <div class="pd-diff-status-ok">
+                    <span>Stabil ✅</span>
+                    <span class="pd-diff-sub">
+                      {diff.consecutive_high > 0 && `${diff.consecutive_high}/3 skor tinggi`}
+                      {diff.consecutive_low > 0 && `${diff.consecutive_low}/3 butuh bantuan`}
+                      {diff.consecutive_high === 0 && diff.consecutive_low === 0 && 'Performa seimbang'}
+                    </span>
+                  </div>
+                )}
+              </div>
+            ))}
+            {(!difficultiesMap[child.id] || difficultiesMap[child.id].length === 0) && (
+              <p class="pd-empty" style="grid-column: 1 / -1;">
+                {child.age_group === 'toddlers'
+                  ? 'Kelompok usia Toddlers fokus pada eksplorasi bebas tanpa penyesuaian kesulitan.'
+                  : 'Belum ada data evaluasi kesulitan. Mulai kerjakan kuis untuk mengaktifkan mesin adaptif!'}
+              </p>
+            )}
+          </div>
         </div>
 
         {/* Charts */}

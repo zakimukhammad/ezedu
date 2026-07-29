@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/ezedu/backend/internal/auth"
+	"github.com/ezedu/backend/internal/engine"
 	"github.com/ezedu/backend/internal/handler"
 	"github.com/ezedu/backend/internal/store"
 	"github.com/go-chi/chi/v5"
@@ -62,11 +63,14 @@ func main() {
 	// Initialize auth service
 	authService := auth.NewService(accountStore, sessionStore)
 
+	// Initialize adaptive difficulty engine
+	adaptiveEngine := engine.NewAdaptiveEngine(db)
+
 	// Initialize handlers
 	authHandler := handler.NewAuthHandler(authService)
 	childHandler := handler.NewChildHandler(childStore, progressStore)
 	categoryHandler := handler.NewCategoryHandler(categoryStore)
-	lessonHandler := handler.NewLessonHandler(lessonStore, categoryStore, progressStore, childStore, badgeStore)
+	lessonHandler := handler.NewLessonHandler(lessonStore, categoryStore, progressStore, childStore, badgeStore, adaptiveEngine)
 	dailyHandler := handler.NewDailyHandler(dailyStore)
 
 	// Build router
@@ -101,6 +105,9 @@ func main() {
 			r.Delete("/children/{id}", childHandler.Delete)
 			r.Put("/children/{id}/daily-limit", childHandler.UpdateDailyLimit)
 			r.Get("/children/{id}/remaining-time", childHandler.GetRemainingTime)
+			r.Get("/children/{id}/difficulty", lessonHandler.GetChildDifficulty)
+			r.Post("/children/{childId}/difficulty/{categoryId}/accept", lessonHandler.AcceptDifficulty)
+			r.Post("/children/{childId}/difficulty/{categoryId}/dismiss", lessonHandler.DismissDifficulty)
 
 			// Categories
 			r.Get("/categories", categoryHandler.List)

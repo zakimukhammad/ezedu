@@ -860,3 +860,56 @@ img {
   justify-content: center;
 }
 
+/* ---- Quiz Difficulty Recommendation Banner ---- */
+.quiz-difficulty-banner {
+  background: rgba(30, 41, 59, 0.9);
+  border: 2px solid rgba(56, 189, 248, 0.4);
+  border-radius: var(--radius-xl);
+  padding: var(--space-lg);
+  text-align: left;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+}
+
+.quiz-difficulty-banner.easier {
+  border-color: rgba(245, 158, 11, 0.6);
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.12), rgba(30, 41, 59, 0.95));
+}
+
+.quiz-difficulty-banner.harder {
+  border-color: rgba(52, 211, 153, 0.6);
+  background: linear-gradient(135deg, rgba(52, 211, 153, 0.12), rgba(30, 41, 59, 0.95));
+}
+
+.diff-header {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-md);
+}
+
+.diff-icon {
+  font-size: 2.2rem;
+  flex-shrink: 0;
+  line-height: 1;
+}
+
+.diff-title {
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: #f8fafc;
+  margin-bottom: 4px;
+}
+
+.diff-desc {
+  font-size: 0.88rem;
+  color: #cbd5e1;
+  line-height: 1.5;
+}
+
+.diff-actions {
+  display: flex;
+  gap: var(--space-sm);
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+

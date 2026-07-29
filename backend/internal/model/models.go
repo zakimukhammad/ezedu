@@ -145,3 +145,19 @@ type DailyChallengeResult struct {
 	Score       int    `json:"score"`
 	CompletedAt string `json:"completed_at"`
 }
+
+// DifficultyAdjustment tracks a child's adaptive difficulty state for a category.
+type DifficultyAdjustment struct {
+	ID               int64   `json:"id"`
+	ChildID          int64   `json:"child_id"`
+	CategoryID       int64   `json:"category_id"`
+	CategorySlug     string  `json:"category_slug,omitempty"`
+	CategoryName     string  `json:"category_name,omitempty"`
+	CurrentLevel     int     `json:"current_level"`
+	RecommendedLevel *int    `json:"recommended_level,omitempty"`
+	Recommendation   string  `json:"recommendation"` // "", "easier", "harder"
+	ConsecutiveLow   int     `json:"consecutive_low"`
+	ConsecutiveHigh  int     `json:"consecutive_high"`
+	LastEvaluatedAt  *string `json:"last_evaluated_at,omitempty"`
+}
+

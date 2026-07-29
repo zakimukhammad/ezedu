@@ -1,0 +1,12 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import ParentDashboard from '../components/ParentDashboard.tsx';
+---
+
+<BaseLayout title="Dashboard Orangtua — EzEdu" description="Pantau kemajuan belajar anak Anda dengan grafik visual, laporan skor, dan riwayat aktivitas">
+  <ParentDashboard client:load />
+</BaseLayout>
+
+<style is:global>
+  @import '../styles/parent-dashboard.css';
+</style>

@@ -165,3 +165,9 @@ export const dailyChallengeApi = {
     request(`/daily-challenge/streak?child_id=${childId}`),
 };
 
+// Parent Dashboard API
+export const parentApi = {
+  getDashboard: () =>
+    request('/parent/dashboard'),
+};
+

@@ -1,0 +1,461 @@
+/* =============================================
+   Parent Dashboard — /orangtua
+   Premium dark glassmorphic analytics design
+   ============================================= */
+
+/* ---- Layout ---- */
+.parent-dashboard {
+  min-height: 100vh;
+  background: var(--gradient-hero);
+  padding-bottom: var(--space-3xl);
+}
+
+.pd-loading {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-md);
+  color: var(--color-text-muted);
+}
+
+/* ---- Top Navigation ---- */
+.pd-nav {
+  background: rgba(15, 23, 42, 0.85);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.pd-nav-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: var(--space-sm) var(--space-lg);
+}
+
+.pd-nav .logo-icon { font-size: 1.5rem; }
+.pd-nav .logo-text { font-size: 1.2rem; font-weight: 700; color: var(--color-text-primary); }
+.pd-nav .text-gradient {
+  background: linear-gradient(135deg, #38bdf8, #a78bfa);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.pd-nav-right {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+/* ---- Header / Hero ---- */
+.pd-hero {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: var(--space-2xl) var(--space-lg) var(--space-lg);
+}
+
+.pd-hero h1 {
+  font-size: 1.8rem;
+  font-weight: 800;
+  color: var(--color-text-primary);
+  margin-bottom: var(--space-xs);
+}
+
+.pd-hero p {
+  color: var(--color-text-muted);
+  font-size: 1rem;
+}
+
+/* ---- Child Tabs ---- */
+.pd-child-tabs {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 var(--space-lg);
+  display: flex;
+  gap: var(--space-sm);
+  overflow-x: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.pd-child-tabs::-webkit-scrollbar { display: none; }
+
+.pd-child-tab {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  padding: var(--space-sm) var(--space-lg);
+  border-radius: var(--radius-lg);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(30, 41, 59, 0.5);
+  color: var(--color-text-muted);
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  white-space: nowrap;
+}
+
+.pd-child-tab:hover {
+  background: rgba(56, 189, 248, 0.1);
+  border-color: rgba(56, 189, 248, 0.3);
+  color: var(--color-text-primary);
+}
+
+.pd-child-tab.active {
+  background: linear-gradient(135deg, rgba(56, 189, 248, 0.2), rgba(167, 139, 250, 0.15));
+  border-color: rgba(56, 189, 248, 0.4);
+  color: #38bdf8;
+  box-shadow: 0 0 20px rgba(56, 189, 248, 0.12);
+}
+
+.pd-child-tab-avatar {
+  font-size: 1.4rem;
+}
+
+/* ---- Dashboard Content ---- */
+.pd-content {
+  max-width: 1200px;
+  margin: var(--space-lg) auto 0;
+  padding: 0 var(--space-lg);
+}
+
+/* ---- Stat Cards ---- */
+.pd-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: var(--space-md);
+  margin-bottom: var(--space-xl);
+}
+
+.pd-stat-card {
+  background: rgba(30, 41, 59, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: var(--radius-lg);
+  padding: var(--space-lg) var(--space-md);
+  text-align: center;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.pd-stat-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.25);
+}
+
+.pd-stat-icon {
+  font-size: 1.6rem;
+  display: block;
+  margin-bottom: var(--space-xs);
+}
+
+.pd-stat-value {
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: var(--color-text-primary);
+  display: block;
+  line-height: 1.2;
+}
+
+.pd-stat-label {
+  font-size: 0.8rem;
+  color: var(--color-text-muted);
+  display: block;
+  margin-top: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* ---- Charts Grid ---- */
+.pd-charts-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-lg);
+  margin-bottom: var(--space-xl);
+}
+
+.pd-chart-card {
+  background: rgba(30, 41, 59, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: var(--radius-xl);
+  padding: var(--space-lg);
+  backdrop-filter: blur(8px);
+}
+
+.pd-chart-card h3 {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--color-text-primary);
+  margin-bottom: var(--space-md);
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+}
+
+.pd-chart-wrap {
+  position: relative;
+  width: 100%;
+  height: 260px;
+}
+
+.pd-chart-wrap canvas {
+  width: 100% !important;
+  height: 100% !important;
+}
+
+.pd-chart-empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 260px;
+  color: var(--color-text-muted);
+  font-size: 0.9rem;
+}
+
+/* Full-width chart */
+.pd-chart-full {
+  grid-column: 1 / -1;
+}
+
+/* ---- Category Progress Bars ---- */
+.pd-section-title {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--color-text-primary);
+  margin-bottom: var(--space-md);
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+}
+
+.pd-cat-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-xl);
+}
+
+.pd-cat-row {
+  background: rgba(30, 41, 59, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: var(--radius-lg);
+  padding: var(--space-md);
+  transition: background 0.2s ease;
+}
+
+.pd-cat-row:hover {
+  background: rgba(30, 41, 59, 0.7);
+}
+
+.pd-cat-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-xs);
+}
+
+.pd-cat-left {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.pd-cat-emoji { font-size: 1.3rem; }
+
+.pd-cat-name {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.pd-cat-sub {
+  font-size: 0.78rem;
+  color: var(--color-text-muted);
+  display: block;
+}
+
+.pd-cat-pct {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #38bdf8;
+  background: rgba(56, 189, 248, 0.1);
+  padding: 2px 10px;
+  border-radius: 20px;
+}
+
+.pd-cat-bar-bg {
+  height: 8px;
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.pd-cat-bar-fill {
+  height: 100%;
+  border-radius: 4px;
+  transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ---- Badge Showcase ---- */
+.pd-badge-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: var(--space-md);
+  margin-bottom: var(--space-xl);
+}
+
+.pd-badge-card {
+  background: rgba(30, 41, 59, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: var(--radius-lg);
+  padding: var(--space-md);
+  text-align: center;
+  transition: transform 0.2s ease;
+}
+
+.pd-badge-card:hover {
+  transform: translateY(-2px);
+}
+
+.pd-badge-earned {
+  border-color: rgba(250, 204, 21, 0.3);
+  background: rgba(250, 204, 21, 0.05);
+}
+
+.pd-badge-locked {
+  opacity: 0.45;
+  filter: grayscale(0.5);
+}
+
+.pd-badge-icon {
+  font-size: 2rem;
+  display: block;
+  margin-bottom: var(--space-xs);
+}
+
+.pd-badge-name {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  margin-bottom: 2px;
+}
+
+.pd-badge-desc {
+  font-size: 0.72rem;
+  color: var(--color-text-muted);
+  line-height: 1.3;
+}
+
+/* ---- Recent Activity ---- */
+.pd-activity-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+  margin-bottom: var(--space-xl);
+}
+
+.pd-activity-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-sm) var(--space-md);
+  background: rgba(30, 41, 59, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: var(--radius-md);
+  transition: background 0.2s ease;
+  text-decoration: none;
+  color: inherit;
+}
+
+.pd-activity-item:hover {
+  background: rgba(30, 41, 59, 0.7);
+}
+
+.pd-activity-left {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.pd-activity-status {
+  font-size: 1rem;
+}
+
+.pd-activity-title {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--color-text-primary);
+}
+
+.pd-activity-date {
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+  display: block;
+}
+
+.pd-activity-score {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--color-text-muted);
+}
+
+/* ---- Empty State ---- */
+.pd-empty {
+  text-align: center;
+  color: var(--color-text-muted);
+  padding: var(--space-xl);
+  font-size: 0.95rem;
+}
+
+/* ---- Responsive ---- */
+@media (max-width: 768px) {
+  .pd-charts-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .pd-stats-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .pd-hero h1 {
+    font-size: 1.4rem;
+  }
+
+  .pd-badge-grid {
+    grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+  }
+}
+
+@media (max-width: 480px) {
+  .pd-stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .pd-chart-wrap {
+    height: 200px;
+  }
+}
+
+/* ---- Animations ---- */
+.pd-fade-in {
+  animation: pdFadeIn 0.4s ease-out;
+}
+
+@keyframes pdFadeIn {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.pd-slide-up {
+  animation: pdSlideUp 0.5s ease-out;
+}
+
+@keyframes pdSlideUp {
+  from { opacity: 0; transform: translateY(24px); }
+  to   { opacity: 1; transform: translateY(0); }
+}

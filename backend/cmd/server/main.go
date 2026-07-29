@@ -113,6 +113,9 @@ func main() {
 			r.Get("/children/{id}/progress", lessonHandler.GetChildProgress)
 			r.Get("/children/{id}/badges", lessonHandler.GetChildBadges)
 
+			// Parent Dashboard
+			r.Get("/parent/dashboard", lessonHandler.GetParentDashboard)
+
 			// Daily Challenges
 			r.Get("/daily-challenge", dailyHandler.GetToday)
 			r.Post("/daily-challenge/submit", dailyHandler.Submit)

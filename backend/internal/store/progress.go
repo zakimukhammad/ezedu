@@ -243,3 +243,113 @@ func (s *ProgressStore) GetChildProgressSummary(childID int64, ageGroup string) 
 
 	return summary, nil
 }
+
+// --- Parent Dashboard Analytics ---
+
+// WeeklyActivityEntry holds daily lesson count and time spent for activity charts.
+type WeeklyActivityEntry struct {
+	Date         string `json:"date"`
+	LessonsCount int    `json:"lessons_count"`
+	TimeSpentSec int    `json:"time_spent_sec"`
+}
+
+// CategoryScoreEntry holds per-category average score percentage for radar charts.
+type CategoryScoreEntry struct {
+	CategorySlug  string  `json:"category_slug"`
+	CategoryName  string  `json:"category_name"`
+	CategoryColor string  `json:"category_color"`
+	AvgScorePct   float64 `json:"avg_score_pct"`
+}
+
+// DailyTimeEntry holds daily time spent for bar charts.
+type DailyTimeEntry struct {
+	Date         string `json:"date"`
+	TimeSpentSec int    `json:"time_spent_sec"`
+}
+
+// GetWeeklyActivity returns daily lesson counts and time spent for the past N weeks.
+func (s *ProgressStore) GetWeeklyActivity(childID int64, weeks int) ([]WeeklyActivityEntry, error) {
+	days := weeks * 7
+	rows, err := s.db.Query(
+		`SELECT DATE(cp.completed_at) as day, COUNT(*) as cnt, COALESCE(SUM(cp.time_spent_sec), 0) as total_time
+		 FROM child_progress cp
+		 WHERE cp.child_id = ?
+		   AND cp.status = 'completed'
+		   AND cp.completed_at >= DATE('now', ? || ' days')
+		 GROUP BY day
+		 ORDER BY day ASC`,
+		childID, fmt.Sprintf("-%d", days),
+	)
+	if err != nil {
+		return nil, fmt.Errorf("weekly activity: %w", err)
+	}
+	defer rows.Close()
+
+	var entries []WeeklyActivityEntry
+	for rows.Next() {
+		var e WeeklyActivityEntry
+		if err := rows.Scan(&e.Date, &e.LessonsCount, &e.TimeSpentSec); err != nil {
+			return nil, fmt.Errorf("scan weekly activity: %w", err)
+		}
+		entries = append(entries, e)
+	}
+	return entries, nil
+}
+
+// GetCategoryScores returns per-category average score percentage for a child.
+func (s *ProgressStore) GetCategoryScores(childID int64, ageGroup string) ([]CategoryScoreEntry, error) {
+	rows, err := s.db.Query(
+		`SELECT c.slug, c.name, c.color,
+		        CASE WHEN COALESCE(SUM(cp.max_possible), 0) > 0
+		             THEN ROUND(CAST(SUM(cp.score) AS REAL) / SUM(cp.max_possible) * 100, 1)
+		             ELSE 0 END as avg_pct
+		 FROM categories c
+		 JOIN lessons l ON l.category_id = c.id AND l.age_group = ?
+		 LEFT JOIN child_progress cp ON cp.lesson_id = l.id AND cp.child_id = ? AND cp.status = 'completed'
+		 GROUP BY c.id
+		 ORDER BY c.sort_order`,
+		ageGroup, childID,
+	)
+	if err != nil {
+		return nil, fmt.Errorf("category scores: %w", err)
+	}
+	defer rows.Close()
+
+	var entries []CategoryScoreEntry
+	for rows.Next() {
+		var e CategoryScoreEntry
+		if err := rows.Scan(&e.CategorySlug, &e.CategoryName, &e.CategoryColor, &e.AvgScorePct); err != nil {
+			return nil, fmt.Errorf("scan category scores: %w", err)
+		}
+		entries = append(entries, e)
+	}
+	return entries, nil
+}
+
+// GetDailyTimeSpent returns time spent per day for the last N days.
+func (s *ProgressStore) GetDailyTimeSpent(childID int64, days int) ([]DailyTimeEntry, error) {
+	rows, err := s.db.Query(
+		`SELECT DATE(cp.completed_at) as day, COALESCE(SUM(cp.time_spent_sec), 0) as total_time
+		 FROM child_progress cp
+		 WHERE cp.child_id = ?
+		   AND cp.status = 'completed'
+		   AND cp.completed_at >= DATE('now', ? || ' days')
+		 GROUP BY day
+		 ORDER BY day ASC`,
+		childID, fmt.Sprintf("-%d", days),
+	)
+	if err != nil {
+		return nil, fmt.Errorf("daily time spent: %w", err)
+	}
+	defer rows.Close()
+
+	var entries []DailyTimeEntry
+	for rows.Next() {
+		var e DailyTimeEntry
+		if err := rows.Scan(&e.Date, &e.TimeSpentSec); err != nil {
+			return nil, fmt.Errorf("scan daily time: %w", err)
+		}
+		entries = append(entries, e)
+	}
+	return entries, nil
+}

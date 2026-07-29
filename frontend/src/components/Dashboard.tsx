@@ -151,6 +151,7 @@ export default function Dashboard() {
           <span class="dash-logo">🎓 EzEdu</span>
           <div class="dash-nav-right">
             <a href="/kemajuan" class="btn-ghost" id="view-progress">📊 Kemajuan</a>
+            <a href="/orangtua" class="btn-ghost" id="view-parent-dashboard">👨‍👩‍👧 Orangtua</a>
             <button class="btn-ghost" onClick={switchProfile} id="switch-profile">
               Ganti Profil
             </button>

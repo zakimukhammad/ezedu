@@ -359,6 +359,59 @@ func (h *LessonHandler) GetChildBadges(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
+// GetParentDashboard handles GET /api/parent/dashboard
+// Returns consolidated analytics for all children under the parent's account.
+func (h *LessonHandler) GetParentDashboard(w http.ResponseWriter, r *http.Request) {
+	accountID := auth.AccountIDFromContext(r.Context())
+
+	children, err := h.children.ListByAccount(accountID)
+	if err != nil {
+		writeJSON(w, http.StatusInternalServerError, map[string]string{"error": "Gagal memuat data anak"})
+		return
+	}
+
+	type childDashboard struct {
+		Child          interface{}                    `json:"child"`
+		Progress       interface{}                    `json:"progress"`
+		WeeklyActivity []store.WeeklyActivityEntry    `json:"weekly_activity"`
+		CategoryScores []store.CategoryScoreEntry     `json:"category_scores"`
+		DailyTime      []store.DailyTimeEntry         `json:"daily_time"`
+		Badges         interface{}                    `json:"badges"`
+	}
+
+	var dashboards []childDashboard
+
+	for _, child := range children {
+		// Progress summary
+		summary, _ := h.progress.GetChildProgressSummary(child.ID, child.AgeGroup)
+
+		// Weekly activity (last 4 weeks)
+		weekly, _ := h.progress.GetWeeklyActivity(child.ID, 4)
+
+		// Category scores
+		catScores, _ := h.progress.GetCategoryScores(child.ID, child.AgeGroup)
+
+		// Daily time (last 14 days)
+		dailyTime, _ := h.progress.GetDailyTimeSpent(child.ID, 14)
+
+		// Badges
+		badges, _ := h.badges.ListChildBadges(child.ID)
+
+		dashboards = append(dashboards, childDashboard{
+			Child:          child,
+			Progress:       summary,
+			WeeklyActivity: weekly,
+			CategoryScores: catScores,
+			DailyTime:      dailyTime,
+			Badges:         badges,
+		})
+	}
+
+	writeJSON(w, http.StatusOK, map[string]interface{}{
+		"children": dashboards,
+	})
+}
+
 func normalizeString(s string) string {
 	s = strings.ToLower(s)
 	var sb strings.Builder

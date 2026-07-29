@@ -14,10 +14,11 @@ import (
 // ChildHandler handles child profile endpoints.
 type ChildHandler struct {
 	children *store.ChildStore
+	progress *store.ProgressStore
 }
 
-func NewChildHandler(children *store.ChildStore) *ChildHandler {
-	return &ChildHandler{children: children}
+func NewChildHandler(children *store.ChildStore, progress *store.ProgressStore) *ChildHandler {
+	return &ChildHandler{children: children, progress: progress}
 }
 
 type createChildRequest struct {
@@ -162,3 +163,88 @@ func (h *ChildHandler) Delete(w http.ResponseWriter, r *http.Request) {
 
 	writeJSON(w, http.StatusOK, map[string]string{"message": "Profil berhasil dihapus"})
 }
+
+type updateDailyLimitRequest struct {
+	DailyLimitMin *int `json:"daily_limit_min"` // nil or int > 0
+}
+
+// UpdateDailyLimit handles PUT /api/children/{id}/daily-limit
+func (h *ChildHandler) UpdateDailyLimit(w http.ResponseWriter, r *http.Request) {
+	accountID := auth.AccountIDFromContext(r.Context())
+	childID, err := strconv.ParseInt(chi.URLParam(r, "id"), 10, 64)
+	if err != nil {
+		writeJSON(w, http.StatusBadRequest, map[string]string{"error": "ID tidak valid"})
+		return
+	}
+
+	existing, err := h.children.GetByID(childID, accountID)
+	if err != nil || existing == nil {
+		writeJSON(w, http.StatusNotFound, map[string]string{"error": "Profil anak tidak ditemukan"})
+		return
+	}
+
+	var req updateDailyLimitRequest
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		writeJSON(w, http.StatusBadRequest, map[string]string{"error": "Format data tidak valid"})
+		return
+	}
+
+	if req.DailyLimitMin != nil {
+		if *req.DailyLimitMin <= 0 || *req.DailyLimitMin > 480 {
+			writeJSON(w, http.StatusBadRequest, map[string]string{"error": "Batas waktu harus antara 1 dan 480 menit"})
+			return
+		}
+	}
+
+	if err := h.children.UpdateDailyLimit(childID, accountID, req.DailyLimitMin); err != nil {
+		writeJSON(w, http.StatusInternalServerError, map[string]string{"error": "Gagal memperbarui batas waktu"})
+		return
+	}
+
+	writeJSON(w, http.StatusOK, map[string]interface{}{
+		"message":         "Batas waktu harian berhasil diperbarui",
+		"daily_limit_min": req.DailyLimitMin,
+	})
+}
+
+// GetRemainingTime handles GET /api/children/{id}/remaining-time
+func (h *ChildHandler) GetRemainingTime(w http.ResponseWriter, r *http.Request) {
+	accountID := auth.AccountIDFromContext(r.Context())
+	childID, err := strconv.ParseInt(chi.URLParam(r, "id"), 10, 64)
+	if err != nil {
+		writeJSON(w, http.StatusBadRequest, map[string]string{"error": "ID tidak valid"})
+		return
+	}
+
+	child, err := h.children.GetByID(childID, accountID)
+	if err != nil || child == nil {
+		writeJSON(w, http.StatusNotFound, map[string]string{"error": "Profil anak tidak ditemukan"})
+		return
+	}
+
+	if child.DailyLimitMin == nil {
+		writeJSON(w, http.StatusOK, map[string]interface{}{
+			"has_limit": false,
+		})
+		return
+	}
+
+	limitMin := *child.DailyLimitMin
+	limitSec := limitMin * 60
+
+	todayTimeSpentSec, err := h.progress.GetTodayTimeSpent(childID)
+	if err != nil {
+		todayTimeSpentSec = 0
+	}
+
+	remainingSec := limitSec - todayTimeSpentSec
+
+	writeJSON(w, http.StatusOK, map[string]interface{}{
+		"has_limit":         true,
+		"daily_limit_min":   limitMin,
+		"time_used_sec":     todayTimeSpentSec,
+		"remaining_sec":     remainingSec,
+		"limit_reached":     remainingSec <= 0,
+	})
+}
+

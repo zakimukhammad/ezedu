@@ -118,3 +118,14 @@ func (s *ChildStore) CountByAccount(accountID int64) (int, error) {
 	err := s.db.QueryRow(`SELECT COUNT(*) FROM children WHERE account_id = ?`, accountID).Scan(&count)
 	return count, err
 }
+
+// UpdateDailyLimit sets or clears the daily time limit for a child (in minutes).
+// Pass nil to remove the limit.
+func (s *ChildStore) UpdateDailyLimit(id, accountID int64, limitMin *int) error {
+	_, err := s.db.Exec(
+		`UPDATE children SET daily_limit_min = ? WHERE id = ? AND account_id = ?`,
+		limitMin, id, accountID,
+	)
+	return err
+}
+

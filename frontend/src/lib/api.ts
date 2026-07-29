@@ -86,6 +86,15 @@ export const childrenApi = {
 
   delete: (id: number) =>
     request(`/children/${id}`, { method: 'DELETE' }),
+
+  updateDailyLimit: (id: number, limitMin: number | null) =>
+    request(`/children/${id}/daily-limit`, {
+      method: 'PUT',
+      body: JSON.stringify({ daily_limit_min: limitMin }),
+    }),
+
+  getRemainingTime: (id: number) =>
+    request(`/children/${id}/remaining-time`),
 };
 
 // Categories API

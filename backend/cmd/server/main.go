@@ -64,7 +64,7 @@ func main() {
 
 	// Initialize handlers
 	authHandler := handler.NewAuthHandler(authService)
-	childHandler := handler.NewChildHandler(childStore)
+	childHandler := handler.NewChildHandler(childStore, progressStore)
 	categoryHandler := handler.NewCategoryHandler(categoryStore)
 	lessonHandler := handler.NewLessonHandler(lessonStore, categoryStore, progressStore, childStore, badgeStore)
 	dailyHandler := handler.NewDailyHandler(dailyStore)
@@ -99,6 +99,8 @@ func main() {
 			r.Post("/children", childHandler.Create)
 			r.Put("/children/{id}", childHandler.Update)
 			r.Delete("/children/{id}", childHandler.Delete)
+			r.Put("/children/{id}/daily-limit", childHandler.UpdateDailyLimit)
+			r.Get("/children/{id}/remaining-time", childHandler.GetRemainingTime)
 
 			// Categories
 			r.Get("/categories", categoryHandler.List)

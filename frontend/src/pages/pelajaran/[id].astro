@@ -1,6 +1,7 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import QuizEngine from '../../components/QuizEngine.tsx';
+import SessionTimer from '../../components/SessionTimer.tsx';
 
 export function getStaticPaths() {
   return Array.from({ length: 100 }, (_, i) => ({ params: { id: String(i + 1) } }));
@@ -11,6 +12,7 @@ const lessonIdNum = parseInt(id, 10);
 ---
 
 <BaseLayout title="Pelajaran Interaktif" description="Selesaikan kuis dan kumpulkan XP!">
+  <SessionTimer client:load />
   <div class="lesson-quiz-page">
     <QuizEngine lessonId={lessonIdNum} client:load />
   </div>

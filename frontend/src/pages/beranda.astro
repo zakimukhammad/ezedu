@@ -1,9 +1,11 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Dashboard from '../components/Dashboard.tsx';
+import SessionTimer from '../components/SessionTimer.tsx';
 ---
 
 <BaseLayout title="Beranda" description="Beranda belajar EzEdu — pilih kategori dan mulai belajar">
+  <SessionTimer client:load />
   <Dashboard client:load />
 </BaseLayout>
 

@@ -353,3 +353,20 @@ func (s *ProgressStore) GetDailyTimeSpent(childID int64, days int) ([]DailyTimeE
 	}
 	return entries, nil
 }
+
+// GetTodayTimeSpent returns total seconds the child has spent on completed lessons today (since midnight local time).
+func (s *ProgressStore) GetTodayTimeSpent(childID int64) (int, error) {
+	var total int
+	err := s.db.QueryRow(
+		`SELECT COALESCE(SUM(time_spent_sec), 0)
+		 FROM child_progress
+		 WHERE child_id = ? AND status = 'completed'
+		   AND DATE(completed_at) = DATE('now')`,
+		childID,
+	).Scan(&total)
+	if err != nil {
+		return 0, fmt.Errorf("get today time spent: %w", err)
+	}
+	return total, nil
+}
+

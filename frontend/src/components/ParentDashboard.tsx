@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'preact/hooks';
-import { parentApi, authApi } from '../lib/api';
+import { parentApi, authApi, childrenApi } from '../lib/api';
 
 // Dynamically import Chart.js to avoid loading it on other pages
 let Chart: any = null;
@@ -35,6 +35,7 @@ interface Child {
   xp_total: number;
   current_level: number;
   streak_days: number;
+  daily_limit_min?: number | null;
 }
 
 interface CategoryProgress {
@@ -148,6 +149,35 @@ export default function ParentDashboard() {
   const [loading, setLoading] = useState(true);
   const [dashboards, setDashboards] = useState<ChildDashboard[]>([]);
   const [selectedIdx, setSelectedIdx] = useState(0);
+  const [savingLimit, setSavingLimit] = useState(false);
+  const [limitMsg, setLimitMsg] = useState('');
+
+  const handleSaveDailyLimit = async (childId: number, limitMin: number | null) => {
+    setSavingLimit(true);
+    setLimitMsg('');
+    const res = await childrenApi.updateDailyLimit(childId, limitMin);
+    setSavingLimit(false);
+    if (res.error) {
+      setLimitMsg(res.error);
+    } else {
+      setLimitMsg('Batas waktu harian berhasil disimpan! ✨');
+      setDashboards(prev =>
+        prev.map(d => {
+          if (d.child.id === childId) {
+            return {
+              ...d,
+              child: {
+                ...d.child,
+                daily_limit_min: limitMin,
+              },
+            };
+          }
+          return d;
+        })
+      );
+      setTimeout(() => setLimitMsg(''), 3000);
+    }
+  };
 
   // Chart refs
   const activityChartRef = useRef<HTMLCanvasElement>(null);
@@ -612,6 +642,43 @@ export default function ParentDashboard() {
             <span class="pd-stat-value">{formatTime(progress?.total_time_spent_sec || 0)}</span>
             <span class="pd-stat-label">Waktu Belajar</span>
           </div>
+        </div>
+
+        {/* Daily Time Limit Settings */}
+        <div class="pd-time-limit-card">
+          <div class="pd-tl-header">
+            <div>
+              <h3>⏰ Batas Waktu Harian ({child.name})</h3>
+              <p>Atur durasi maksimal belajar per hari. Timer akan muncul saat anak belajar.</p>
+            </div>
+            <span class={`pd-tl-badge ${child.daily_limit_min ? 'active' : ''}`}>
+              {child.daily_limit_min ? `${child.daily_limit_min} Min / Hari` : 'Tanpa Batas'}
+            </span>
+          </div>
+
+          <div class="pd-tl-presets">
+            {[15, 30, 45, 60, 90, 120].map(mins => (
+              <button
+                key={mins}
+                type="button"
+                class={`pd-tl-preset-btn ${child.daily_limit_min === mins ? 'active' : ''}`}
+                onClick={() => handleSaveDailyLimit(child.id, mins)}
+                disabled={savingLimit}
+              >
+                {mins} Menit
+              </button>
+            ))}
+            <button
+              type="button"
+              class={`pd-tl-preset-btn ${!child.daily_limit_min ? 'active' : ''}`}
+              onClick={() => handleSaveDailyLimit(child.id, null)}
+              disabled={savingLimit}
+            >
+              Tanpa Batas
+            </button>
+          </div>
+
+          {limitMsg && <p class="pd-tl-msg">{limitMsg}</p>}
         </div>
 
         {/* Charts */}

@@ -250,6 +250,24 @@ export default function Dashboard() {
         </section>
       )}
 
+      {/* Challengers Leaderboard Banner */}
+      {child.age_group === 'challengers' && (
+        <section class="dash-leaderboard animate-slide-up" style="max-width: 1200px; margin: var(--space-xl) auto 0; padding: 0 var(--space-lg);">
+          <div class="leaderboard-banner" style="background: linear-gradient(135deg, rgba(168, 85, 247, 0.15), rgba(99, 102, 241, 0.15)); border: 1px solid rgba(168, 85, 247, 0.3); border-radius: var(--radius-xl); padding: var(--space-lg) var(--space-xl); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: var(--space-md);">
+            <div style="display: flex; align-items: center; gap: 1rem;">
+              <span style="font-size: 2.2rem;">🏆</span>
+              <div>
+                <h3 style="margin: 0; font-size: 1.1rem;">Papan Peringkat Mingguan</h3>
+                <p style="margin: 0.25rem 0 0; color: var(--color-text-muted); font-size: 0.85rem;">Bandingkan skor XP kamu secara anonim dengan pembelajar Challengers lainnya!</p>
+              </div>
+            </div>
+            <a href="/papan-peringkat" class="btn btn-secondary" style="white-space: nowrap;" id="view-leaderboard-btn">
+              Lihat Peringkat →
+            </a>
+          </div>
+        </section>
+      )}
+
       {/* Categories Grid */}
       <section class="dash-content">
         <h2 class="dash-section-title">Pilih Kategori Belajar</h2>

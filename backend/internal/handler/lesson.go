@@ -19,8 +19,9 @@ type LessonHandler struct {
 	categories *store.CategoryStore
 	progress   *store.ProgressStore
 	children   *store.ChildStore
-	badges     *store.BadgeStore
-	adaptive   *engine.AdaptiveEngine
+	badges      *store.BadgeStore
+	adaptive    *engine.AdaptiveEngine
+	leaderboard *store.LeaderboardStore
 }
 
 func NewLessonHandler(
@@ -30,14 +31,16 @@ func NewLessonHandler(
 	children *store.ChildStore,
 	badges *store.BadgeStore,
 	adaptive *engine.AdaptiveEngine,
+	leaderboard *store.LeaderboardStore,
 ) *LessonHandler {
 	return &LessonHandler{
-		lessons:    lessons,
-		categories: categories,
-		progress:   progress,
-		children:   children,
-		badges:     badges,
-		adaptive:   adaptive,
+		lessons:     lessons,
+		categories:  categories,
+		progress:    progress,
+		children:    children,
+		badges:      badges,
+		adaptive:    adaptive,
+		leaderboard: leaderboard,
 	}
 }
 
@@ -291,6 +294,11 @@ func (h *LessonHandler) CompleteLesson(w http.ResponseWriter, r *http.Request) {
 	if err := h.progress.CompleteLesson(req.ChildID, lessonID, req.FinalScore, req.MaxScore, req.TimeSpentSec, xpReward); err != nil {
 		writeJSON(w, http.StatusInternalServerError, map[string]string{"error": "Gagal menyimpan progres pelajaran"})
 		return
+	}
+
+	if h.leaderboard != nil && child != nil && child.LeaderboardOptIn {
+		weekStart := store.CurrentWeekStart()
+		_ = h.leaderboard.UpsertWeeklyXP(req.ChildID, weekStart, xpReward, child.AvatarID)
 	}
 
 	// Check for Level-Up

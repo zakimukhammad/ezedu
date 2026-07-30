@@ -25,7 +25,17 @@ type Child struct {
 	CurrentLevel  int     `json:"current_level"`
 	StreakDays    int     `json:"streak_days"`
 	LastActive    *string `json:"last_active,omitempty"`
-	DailyLimitMin *int    `json:"daily_limit_min,omitempty"`
+	DailyLimitMin    *int    `json:"daily_limit_min,omitempty"`
+	LeaderboardOptIn bool    `json:"leaderboard_opt_in"`
+}
+
+// LeaderboardEntry represents a child's rank entry on the weekly leaderboard.
+type LeaderboardEntry struct {
+	Rank        int    `json:"rank"`
+	DisplayName string `json:"display_name"`
+	AvatarID    int    `json:"avatar_id"`
+	WeeklyXP    int    `json:"weekly_xp"`
+	IsMe        bool   `json:"is_me"`
 }
 
 // Category represents a learning category (e.g., Matematika, Sains).

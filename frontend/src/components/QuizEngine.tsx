@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'preact/hooks';
 import { lessonsApi, activitiesApi, childrenApi } from '../lib/api';
 import { sounds } from '../lib/sound';
+import { speakIndonesian } from '../lib/speech';
 import BlockCodingEngine from './BlockCodingEngine';
 import ToddlerEngine from './ToddlerEngine';
 import CanvasDrawingEngine from './CanvasDrawingEngine';
@@ -85,6 +86,20 @@ export default function QuizEngine({ lessonId }: Props) {
     loadLessonData();
   }, [lessonId]);
 
+  const currentActivity = activities[currentIndex];
+  let currentQuestion: any = null;
+  if (currentActivity) {
+    try {
+      currentQuestion = JSON.parse(currentActivity.question_json);
+    } catch (e) {}
+  }
+
+  useEffect(() => {
+    if (currentQuestion?.prompt && child?.age_group === 'explorers' && !isMuted) {
+      speakIndonesian(currentQuestion.prompt, 1.0);
+    }
+  }, [currentIndex, currentActivity?.id, child?.age_group]);
+
   const loadLessonData = async () => {
     setLoading(true);
     const { data } = await lessonsApi.getById(lessonId);
@@ -124,14 +139,6 @@ export default function QuizEngine({ lessonId }: Props) {
       console.error('Failed to parse question JSON', e);
     }
   };
-
-  const currentActivity = activities[currentIndex];
-  let currentQuestion: any = null;
-  if (currentActivity) {
-    try {
-      currentQuestion = JSON.parse(currentActivity.question_json);
-    } catch (e) {}
-  }
 
   // Handle Drag & Drop item reordering (move item up/down)
   const moveItem = (fromIndex: number, toIndex: number) => {
@@ -193,9 +200,15 @@ export default function QuizEngine({ lessonId }: Props) {
       if (data.is_correct) {
         sounds.playCorrect();
         setTotalScore((prev) => prev + data.score);
+        if (child.age_group === 'explorers' && !isMuted) {
+          speakIndonesian(data.explanation || data.feedback, 1.0);
+        }
       } else {
         sounds.playWrong();
         setAttemptCount((prev) => prev + 1);
+        if (child.age_group === 'explorers' && !isMuted) {
+          speakIndonesian(data.hint || data.feedback, 1.0);
+        }
       }
     }
   };
@@ -550,7 +563,21 @@ export default function QuizEngine({ lessonId }: Props) {
         </div>
 
         {!['math_racer', 'word_builder', 'maze_logic'].includes(currentQuestion?.game_type) && currentActivity.type !== 'timed' && (
-          <h2 class="quiz-prompt mt-md">{currentQuestion?.prompt}</h2>
+          <div style="display: flex; align-items: center; justify-content: space-between; gap: 0.5rem;" class="mt-md">
+            <h2 class="quiz-prompt" style="margin-top: 0;">{currentQuestion?.prompt}</h2>
+            {child?.age_group === 'explorers' && (
+              <button
+                type="button"
+                onClick={() => currentQuestion?.prompt && speakIndonesian(currentQuestion.prompt, 1.0)}
+                class="btn-ghost"
+                style="font-size: 1.4rem; padding: 0.2rem 0.6rem; cursor: pointer; border-radius: var(--radius-full); background: rgba(255, 255, 255, 0.08);"
+                title="Dengarkan Soal 🔊"
+                id="listen-prompt-btn"
+              >
+                🔊
+              </button>
+            )}
+          </div>
         )}
 
         {/* Multiple Choice Component */}

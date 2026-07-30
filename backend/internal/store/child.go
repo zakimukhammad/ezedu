@@ -49,7 +49,7 @@ func (s *ChildStore) Create(accountID int64, name string, birthYear int, avatarI
 func (s *ChildStore) ListByAccount(accountID int64) ([]model.Child, error) {
 	rows, err := s.db.Query(
 		`SELECT id, account_id, name, birth_year, age_group, avatar_id,
-		        xp_total, current_level, streak_days, last_active, daily_limit_min
+		        xp_total, current_level, streak_days, last_active, daily_limit_min, leaderboard_opt_in
 		 FROM children WHERE account_id = ? ORDER BY id`, accountID,
 	)
 	if err != nil {
@@ -63,7 +63,7 @@ func (s *ChildStore) ListByAccount(accountID int64) ([]model.Child, error) {
 		if err := rows.Scan(
 			&c.ID, &c.AccountID, &c.Name, &c.BirthYear, &c.AgeGroup,
 			&c.AvatarID, &c.XPTotal, &c.CurrentLevel, &c.StreakDays,
-			&c.LastActive, &c.DailyLimitMin,
+			&c.LastActive, &c.DailyLimitMin, &c.LeaderboardOptIn,
 		); err != nil {
 			return nil, fmt.Errorf("scan child: %w", err)
 		}
@@ -77,12 +77,12 @@ func (s *ChildStore) GetByID(id, accountID int64) (*model.Child, error) {
 	c := &model.Child{}
 	err := s.db.QueryRow(
 		`SELECT id, account_id, name, birth_year, age_group, avatar_id,
-		        xp_total, current_level, streak_days, last_active, daily_limit_min
+		        xp_total, current_level, streak_days, last_active, daily_limit_min, leaderboard_opt_in
 		 FROM children WHERE id = ? AND account_id = ?`, id, accountID,
 	).Scan(
 		&c.ID, &c.AccountID, &c.Name, &c.BirthYear, &c.AgeGroup,
 		&c.AvatarID, &c.XPTotal, &c.CurrentLevel, &c.StreakDays,
-		&c.LastActive, &c.DailyLimitMin,
+		&c.LastActive, &c.DailyLimitMin, &c.LeaderboardOptIn,
 	)
 	if err == sql.ErrNoRows {
 		return nil, nil
@@ -125,6 +125,15 @@ func (s *ChildStore) UpdateDailyLimit(id, accountID int64, limitMin *int) error 
 	_, err := s.db.Exec(
 		`UPDATE children SET daily_limit_min = ? WHERE id = ? AND account_id = ?`,
 		limitMin, id, accountID,
+	)
+	return err
+}
+
+// UpdateLeaderboardOptIn sets the opt-in preference for the leaderboard.
+func (s *ChildStore) UpdateLeaderboardOptIn(id, accountID int64, optIn bool) error {
+	_, err := s.db.Exec(
+		`UPDATE children SET leaderboard_opt_in = ? WHERE id = ? AND account_id = ?`,
+		optIn, id, accountID,
 	)
 	return err
 }

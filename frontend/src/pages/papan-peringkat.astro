@@ -1,0 +1,21 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Leaderboard from '../components/Leaderboard.tsx';
+import SessionTimer from '../components/SessionTimer.tsx';
+---
+
+<BaseLayout title="Papan Peringkat - EzEdu" description="Papan peringkat mingguan anonim khusus kelompok usia Challengers">
+  <SessionTimer client:load />
+  <div class="leaderboard-page py-xl">
+    <div class="container">
+      <Leaderboard client:load />
+    </div>
+  </div>
+</BaseLayout>
+
+<style>
+  .leaderboard-page {
+    min-height: 80vh;
+    padding-bottom: var(--space-3xl);
+  }
+</style>

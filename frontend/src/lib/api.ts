@@ -104,6 +104,18 @@ export const childrenApi = {
 
   dismissDifficulty: (childId: number, categoryId: number) =>
     request(`/children/${childId}/difficulty/${categoryId}/dismiss`, { method: 'POST' }),
+
+  toggleLeaderboardOptIn: (id: number, optIn: boolean) =>
+    request(`/children/${id}/leaderboard-opt-in`, {
+      method: 'PUT',
+      body: JSON.stringify({ opt_in: optIn }),
+    }),
+};
+
+// Leaderboard API
+export const leaderboardApi = {
+  getWeekly: (childId: number) =>
+    request(`/leaderboard?child_id=${childId}`),
 };
 
 // Categories API

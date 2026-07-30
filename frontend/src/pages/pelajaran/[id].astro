@@ -4,7 +4,7 @@ import QuizEngine from '../../components/QuizEngine.tsx';
 import SessionTimer from '../../components/SessionTimer.tsx';
 
 export function getStaticPaths() {
-  return Array.from({ length: 100 }, (_, i) => ({ params: { id: String(i + 1) } }));
+  return Array.from({ length: 500 }, (_, i) => ({ params: { id: String(i + 1) } }));
 }
 
 const { id } = Astro.params;

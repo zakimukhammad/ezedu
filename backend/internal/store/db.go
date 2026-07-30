@@ -55,6 +55,7 @@ func Migrate(db *sql.DB) error {
 			streak_days INTEGER DEFAULT 0,
 			last_active DATE,
 			daily_limit_min INTEGER,
+			leaderboard_opt_in BOOLEAN DEFAULT 0,
 			created_at DATETIME DEFAULT CURRENT_TIMESTAMP
 		)`,
 
@@ -173,6 +174,16 @@ func Migrate(db *sql.DB) error {
 			UNIQUE(child_id, category_id)
 		)`,
 
+		`CREATE TABLE IF NOT EXISTS leaderboard_entries (
+			id INTEGER PRIMARY KEY AUTOINCREMENT,
+			child_id INTEGER NOT NULL REFERENCES children(id) ON DELETE CASCADE,
+			week_start DATE NOT NULL,
+			weekly_xp INTEGER DEFAULT 0,
+			display_name TEXT NOT NULL DEFAULT 'Pelajar Hebat',
+			avatar_id INTEGER DEFAULT 1,
+			UNIQUE(child_id, week_start)
+		)`,
+
 		// Indexes
 		`CREATE INDEX IF NOT EXISTS idx_children_account ON children(account_id)`,
 		`CREATE INDEX IF NOT EXISTS idx_lessons_category_age ON lessons(category_id, age_group, level)`,
@@ -181,6 +192,7 @@ func Migrate(db *sql.DB) error {
 		`CREATE INDEX IF NOT EXISTS idx_badges_child ON child_badges(child_id)`,
 		`CREATE INDEX IF NOT EXISTS idx_sessions_expires ON sessions(expires_at)`,
 		`CREATE INDEX IF NOT EXISTS idx_difficulty_child_cat ON difficulty_adjustments(child_id, category_id)`,
+		`CREATE INDEX IF NOT EXISTS idx_leaderboard_week ON leaderboard_entries(week_start, weekly_xp DESC)`,
 	}
 
 	for i, m := range migrations {
@@ -189,9 +201,12 @@ func Migrate(db *sql.DB) error {
 		}
 	}
 
-	// Dynamic schema upgrade for pre-existing SQLite databases missing 'toddlers' in CHECK constraint
+	// Dynamic schema upgrade for pre-existing SQLite databases missing leaderboard_opt_in column
 	var childrenDDL string
 	err := db.QueryRow(`SELECT sql FROM sqlite_master WHERE type='table' AND name='children'`).Scan(&childrenDDL)
+	if err == nil && !strings.Contains(childrenDDL, "leaderboard_opt_in") {
+		_, _ = db.Exec(`ALTER TABLE children ADD COLUMN leaderboard_opt_in BOOLEAN DEFAULT 0;`)
+	}
 	if err == nil && !strings.Contains(childrenDDL, "toddlers") {
 		_, _ = db.Exec(`PRAGMA foreign_keys=OFF;`)
 		_, _ = db.Exec(`CREATE TABLE children_new (
@@ -206,6 +221,7 @@ func Migrate(db *sql.DB) error {
 			streak_days INTEGER DEFAULT 0,
 			last_active DATE,
 			daily_limit_min INTEGER,
+			leaderboard_opt_in BOOLEAN DEFAULT 0,
 			created_at DATETIME DEFAULT CURRENT_TIMESTAMP
 		);`)
 		_, _ = db.Exec(`INSERT INTO children_new SELECT * FROM children;`)

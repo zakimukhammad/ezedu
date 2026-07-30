@@ -49,6 +49,12 @@ func main() {
 	if err := store.SeedCurriculum(db); err != nil {
 		log.Printf("Warning: Failed to seed curriculum: %v", err)
 	}
+	if err := store.SeedL4L5Content(db); err != nil {
+		log.Printf("Warning: Failed to seed L4-L5 content: %v", err)
+	}
+	if err := store.SeedExtraActivities(db); err != nil {
+		log.Printf("Warning: Failed to seed extra activities: %v", err)
+	}
 
 	// Initialize stores
 	accountStore := store.NewAccountStore(db)
@@ -59,6 +65,7 @@ func main() {
 	progressStore := store.NewProgressStore(db)
 	badgeStore := store.NewBadgeStore(db)
 	dailyStore := store.NewDailyStore(db)
+	leaderboardStore := store.NewLeaderboardStore(db)
 
 	// Initialize auth service
 	authService := auth.NewService(accountStore, sessionStore)
@@ -70,8 +77,9 @@ func main() {
 	authHandler := handler.NewAuthHandler(authService)
 	childHandler := handler.NewChildHandler(childStore, progressStore)
 	categoryHandler := handler.NewCategoryHandler(categoryStore)
-	lessonHandler := handler.NewLessonHandler(lessonStore, categoryStore, progressStore, childStore, badgeStore, adaptiveEngine)
+	lessonHandler := handler.NewLessonHandler(lessonStore, categoryStore, progressStore, childStore, badgeStore, adaptiveEngine, leaderboardStore)
 	dailyHandler := handler.NewDailyHandler(dailyStore)
+	leaderboardHandler := handler.NewLeaderboardHandler(leaderboardStore, childStore)
 
 	// Build router
 	r := chi.NewRouter()
@@ -108,6 +116,7 @@ func main() {
 			r.Get("/children/{id}/difficulty", lessonHandler.GetChildDifficulty)
 			r.Post("/children/{childId}/difficulty/{categoryId}/accept", lessonHandler.AcceptDifficulty)
 			r.Post("/children/{childId}/difficulty/{categoryId}/dismiss", lessonHandler.DismissDifficulty)
+			r.Put("/children/{id}/leaderboard-opt-in", leaderboardHandler.ToggleOptIn)
 
 			// Categories
 			r.Get("/categories", categoryHandler.List)
@@ -121,6 +130,9 @@ func main() {
 			// Progress & Badges
 			r.Get("/children/{id}/progress", lessonHandler.GetChildProgress)
 			r.Get("/children/{id}/badges", lessonHandler.GetChildBadges)
+
+			// Leaderboard
+			r.Get("/leaderboard", leaderboardHandler.GetWeekly)
 
 			// Parent Dashboard
 			r.Get("/parent/dashboard", lessonHandler.GetParentDashboard)

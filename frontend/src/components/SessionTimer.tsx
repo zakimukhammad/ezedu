@@ -93,26 +93,7 @@ export default function SessionTimer() {
 
   return (
     <>
-      <div
-        class={`session-timer-pill ${isDanger ? 'session-timer--danger' : isWarning ? 'session-timer--warning' : ''} ${isMinimized ? 'session-timer--minimized' : ''}`}
-      >
-        <button
-          type="button"
-          class="session-timer-toggle"
-          onClick={() => setIsMinimized(!isMinimized)}
-          title={isMinimized ? 'Tampilkan Timer' : 'Sembunyikan Timer'}
-        >
-          ⏰
-        </button>
-
-        {!isMinimized && (
-          <div class="session-timer-content">
-            <span class="session-timer-label">Sisa Waktu:</span>
-            <span class="session-timer-time">{formatRemaining(remainingSec)}</span>
-          </div>
-        )}
-      </div>
-
+      {/* Countdown timer pill hidden */}
       {showModal && (
         <BreakTimeModal
           minutesLearned={minutesLearned}

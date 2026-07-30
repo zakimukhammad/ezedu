@@ -620,4 +620,35 @@
   margin-top: 2px;
 }
 
+@media (max-width: 768px) {
+  .pd-nav-inner {
+    padding: var(--space-xs) var(--space-md);
+  }
+
+  .pd-nav-right {
+    gap: var(--space-xs);
+  }
+
+  .pd-hero {
+    padding: var(--space-lg) var(--space-md) var(--space-md);
+    text-align: center;
+  }
+
+  .pd-child-tabs {
+    padding: 0 var(--space-md);
+    justify-content: flex-start;
+  }
+
+  .pd-child-tab {
+    padding: var(--space-xs) var(--space-md);
+    font-size: 0.85rem;
+    white-space: nowrap;
+  }
+
+  .pd-stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-sm);
+  }
+}
+
 

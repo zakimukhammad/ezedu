@@ -11,6 +11,15 @@ import BaseLayout from '../layouts/BaseLayout.astro';
         <span class="logo-text">Ez<span class="text-gradient">Edu</span></span>
       </a>
       <div class="nav-actions">
+        <a
+          href="https://trakteer.id/zaki_mukhammad"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="btn btn-secondary support-dev-btn"
+          id="nav-support"
+        >
+          ☕ Dukung Pengembang
+        </a>
         <a href="/masuk" class="btn btn-secondary" id="nav-login">Masuk</a>
         <a href="/daftar" class="btn btn-primary" id="nav-signup">Daftar Gratis</a>
       </div>
@@ -180,7 +189,18 @@ import BaseLayout from '../layouts/BaseLayout.astro';
   <!-- Footer -->
   <footer class="footer">
     <div class="container text-center">
-      <p class="text-muted">© 2026 EzEdu. Dibuat dengan ❤️ untuk anak-anak Indonesia.</p>
+      <p class="text-muted mb-xs">© 2026 EzEdu. Dibuat dengan ❤️ untuk anak-anak Indonesia.</p>
+      <p class="mt-xs">
+        <a
+          href="https://trakteer.id/zaki_mukhammad"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="support-link"
+          id="footer-support-dev"
+        >
+          ☕ Dukung Pengembang di Trakteer
+        </a>
+      </p>
     </div>
   </footer>
 </BaseLayout>
@@ -487,6 +507,21 @@ import BaseLayout from '../layouts/BaseLayout.astro';
   .footer {
     padding: var(--space-xl) 0;
     border-top: 1px solid var(--color-border);
+  }
+
+  .support-link {
+    color: #f59e0b;
+    font-weight: 600;
+    text-decoration: none;
+    transition: color 0.2s ease, transform 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+  }
+
+  .support-link:hover {
+    color: #fbbf24;
+    text-decoration: underline;
   }
 
   @media (max-width: 768px) {

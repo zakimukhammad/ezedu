@@ -61,6 +61,7 @@ export default function Dashboard() {
   const [dailyCompleted, setDailyCompleted] = useState(false);
   const [dailyStreak, setDailyStreak] = useState(0);
   const [loading, setLoading] = useState(true);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   useEffect(() => {
     // Get selected child from sessionStorage
@@ -149,13 +150,33 @@ export default function Dashboard() {
       <nav class="dash-nav">
         <div class="dash-nav-inner">
           <span class="dash-logo">🎓 EzEdu</span>
-          <div class="dash-nav-right">
-            <a href="/kemajuan" class="btn-ghost" id="view-progress">📊 Kemajuan</a>
-            <a href="/orangtua" class="btn-ghost" id="view-parent-dashboard">👨‍👩‍👧 Orangtua</a>
-            <button class="btn-ghost" onClick={switchProfile} id="switch-profile">
+          <button
+            type="button"
+            class="dash-menu-toggle"
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            aria-label="Menu Toggle"
+            id="dash-mobile-toggle"
+          >
+            {mobileMenuOpen ? '✕' : '☰'}
+          </button>
+          <div class={`dash-nav-right ${mobileMenuOpen ? 'dash-nav-right--open' : ''}`}>
+            <a
+              href="https://trakteer.id/zaki_mukhammad"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="btn-ghost"
+              style="color: #f59e0b; font-weight: 600;"
+              id="dash-support-dev"
+              onClick={() => setMobileMenuOpen(false)}
+            >
+              ☕ Dukung Pengembang
+            </a>
+            <a href="/kemajuan" class="btn-ghost" id="view-progress" onClick={() => setMobileMenuOpen(false)}>📊 Kemajuan</a>
+            <a href="/orangtua" class="btn-ghost" id="view-parent-dashboard" onClick={() => setMobileMenuOpen(false)}>👨‍👩‍👧 Orangtua</a>
+            <button class="btn-ghost" onClick={() => { setMobileMenuOpen(false); switchProfile(); }} id="switch-profile">
               Ganti Profil
             </button>
-            <button class="btn-ghost" onClick={handleLogout} id="logout-btn">
+            <button class="btn-ghost" onClick={() => { setMobileMenuOpen(false); handleLogout(); }} id="logout-btn">
               Keluar
             </button>
           </div>
@@ -303,6 +324,22 @@ export default function Dashboard() {
           </div>
         </div>
       </section>
+
+      {/* Dashboard Footer */}
+      <footer class="dash-footer text-center mt-2xl py-lg" style="border-top: 1px solid var(--color-border); color: var(--color-text-muted); font-size: 0.85rem; padding: 2rem 1rem 1rem;">
+        <p>© 2026 EzEdu. Dibuat dengan ❤️ untuk anak-anak Indonesia.</p>
+        <p style="margin-top: 0.4rem;">
+          <a
+            href="https://trakteer.id/zaki_mukhammad"
+            target="_blank"
+            rel="noopener noreferrer"
+            style="color: #f59e0b; text-decoration: none; font-weight: 600; display: inline-flex; align-items: center; gap: 0.3rem;"
+            id="dash-footer-support-link"
+          >
+            ☕ Dukung Pengembang di Trakteer
+          </a>
+        </p>
+      </footer>
     </div>
   );
 }

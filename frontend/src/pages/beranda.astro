@@ -26,13 +26,14 @@ import SessionTimer from '../components/SessionTimer.tsx';
 
   /* Dashboard Nav */
   .dash-nav {
-    background: rgba(15, 23, 42, 0.9);
-    backdrop-filter: blur(12px);
+    background: rgba(15, 23, 42, 0.92);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
     border-bottom: 1px solid var(--color-border);
-    padding: var(--space-sm) var(--space-lg);
+    padding: var(--space-xs) var(--space-lg);
     position: sticky;
     top: 0;
-    z-index: 50;
+    z-index: 950;
   }
 
   .dash-nav-inner {
@@ -41,7 +42,8 @@ import SessionTimer from '../components/SessionTimer.tsx';
     display: flex;
     align-items: center;
     justify-content: space-between;
-    height: 3rem;
+    height: 3.25rem;
+    position: relative;
   }
 
   .dash-logo {
@@ -50,8 +52,26 @@ import SessionTimer from '../components/SessionTimer.tsx';
     font-weight: 800;
   }
 
+  .dash-menu-toggle {
+    display: none;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    color: var(--color-text);
+    font-size: 1.25rem;
+    padding: 0.3rem 0.65rem;
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    line-height: 1;
+    transition: all var(--transition-fast);
+  }
+
+  .dash-menu-toggle:hover {
+    background: rgba(255, 255, 255, 0.15);
+  }
+
   .dash-nav-right {
     display: flex;
+    align-items: center;
     gap: var(--space-sm);
   }
 
@@ -65,6 +85,9 @@ import SessionTimer from '../components/SessionTimer.tsx';
     padding: var(--space-xs) var(--space-sm);
     border-radius: var(--radius-sm);
     transition: all var(--transition-fast);
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
   }
 
   .btn-ghost:hover {
@@ -244,13 +267,68 @@ import SessionTimer from '../components/SessionTimer.tsx';
   }
 
   @media (max-width: 768px) {
+    .dash-menu-toggle {
+      display: inline-flex;
+    }
+
+    .dash-nav-right {
+      display: none;
+      position: absolute;
+      top: calc(100% + 0.4rem);
+      left: -0.5rem;
+      right: -0.5rem;
+      background: rgba(15, 23, 42, 0.96);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-lg);
+      padding: var(--space-md);
+      flex-direction: column;
+      gap: var(--space-xs);
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.6);
+      z-index: 990;
+    }
+
+    .dash-nav-right.dash-nav-right--open {
+      display: flex;
+    }
+
+    .dash-nav-right .btn-ghost {
+      width: 100%;
+      justify-content: center;
+      padding: var(--space-sm) var(--space-md);
+      background: rgba(255, 255, 255, 0.04);
+      border-radius: var(--radius-md);
+      font-size: 0.95rem;
+    }
+
     .dash-welcome {
       flex-direction: column;
       text-align: center;
+      margin: var(--space-md) auto;
+      padding: var(--space-lg) var(--space-md);
+      gap: var(--space-md);
     }
 
     .welcome-left {
       flex-direction: column;
+      gap: var(--space-xs);
+    }
+
+    .welcome-avatar {
+      width: 4rem;
+      height: 4rem;
+      font-size: 2.5rem;
+    }
+
+    .welcome-name {
+      font-size: 1.3rem;
+    }
+
+    .welcome-stats {
+      justify-content: center;
+      gap: var(--space-md) var(--space-lg);
+      width: 100%;
     }
 
     .category-grid {

@@ -600,6 +600,16 @@ export default function ParentDashboard() {
             <span class="logo-text">Ez<span class="text-gradient">Edu</span></span>
           </a>
           <div class="pd-nav-right">
+            <a
+              href="https://trakteer.id/zaki_mukhammad"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="btn-ghost"
+              style="color: #f59e0b; font-weight: 600;"
+              id="pd-support-dev"
+            >
+              ☕ Dukung Pengembang
+            </a>
             <a href="/beranda" class="btn-ghost" id="pd-back-beranda">← Beranda</a>
           </div>
         </div>
@@ -898,6 +908,22 @@ export default function ParentDashboard() {
           )}
         </div>
       </div>
+
+      {/* Parent Dashboard Footer */}
+      <footer style="text-align: center; margin-top: 3rem; padding: 2rem 1rem; border-top: 1px solid rgba(255,255,255,0.08); color: var(--color-text-muted); font-size: 0.85rem;">
+        <p>© 2026 EzEdu. Dibuat dengan ❤️ untuk anak-anak Indonesia.</p>
+        <p style="margin-top: 0.4rem;">
+          <a
+            href="https://trakteer.id/zaki_mukhammad"
+            target="_blank"
+            rel="noopener noreferrer"
+            style="color: #f59e0b; text-decoration: none; font-weight: 600; display: inline-flex; align-items: center; gap: 0.3rem;"
+            id="pd-footer-support-link"
+          >
+            ☕ Dukung Pengembang di Trakteer
+          </a>
+        </p>
+      </footer>
     </div>
   );
 }
